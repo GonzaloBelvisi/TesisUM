@@ -487,7 +487,8 @@
       ? `#m_${code.toLowerCase()}_${id}`
       : `#${code.toLowerCase()}_${id}`;
     var raw = $(sel).val().replace("°C","").trim();
-    if (!/^\d+([,]\d+)?$/.test(raw)) return showToast('warning', "Formato inválido. Usa números con coma.");
+    if (!/^\d+([.,]\d+)?$/.test(raw)) return showToast('warning', "Formato inválido. Usa números (ej: 4.5 o 4,5).");
+    raw = raw.replace(",", ".");
     updateSetpoint(id, code, raw, mobile);
   }
 
