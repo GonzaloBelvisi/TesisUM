@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico Completo - Sitrad Web Interface</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        
+        h4 {
+            color: #666;
+            margin-top: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-left: 0;
+            color: #666;
+            font-style: italic;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .header h1 {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .checkmark {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .pending {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .no-print {
+                display: none;
+            }
+            
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Informe Técnico Completo</h1>
+        <h2>Sistema de Monitoreo IoT de Cámaras de Maduración - Almar SRL</h2>
+        <div class="meta">
+            <p><strong>Proyecto:</strong> Sitrad Web Interface</p>
+            <p><strong>Versión:</strong> 1.0.0 | <strong>Fecha:</strong> Diciembre 2025</p>
+            <p><strong>Tecnología:</strong> ASP.NET Core 8.0 MVC | <strong>Autor:</strong> Gonzalo Belvisi</p>
+        </div>
+    </div>
+
+    <div class="toc">
+        <h2>📋 Tabla de Contenidos</h2>
+        <ul>
+            <li><a href="#resumen">1. Resumen Ejecutivo</a></li>
+            <li><a href="#descripcion">2. Descripción del Proyecto</a></li>
+            <li><a href="#arquitectura">3. Arquitectura del Sistema</a></li>
+            <li><a href="#stack">4. Stack Tecnológico</a></li>
+            <li><a href="#funcionalidades">5. Funcionalidades Implementadas</a></li>
+            <li><a href="#estructura">6. Estructura del Proyecto</a></li>
+            <li><a href="#modelo">7. Modelo de Datos</a></li>
+            <li><a href="#configuracion">8. Configuración y Despliegue</a></li>
+            <li><a href="#seguridad">9. Seguridad</a></li>
+            <li><a href="#diagramas">10. Diagramas</a></li>
+            <li><a href="#uso">11. Guías de Uso</a></li>
+            <li><a href="#referencias">12. Referencias Técnicas</a></li>
+        </ul>
+    </div>
+
+    <h1 id="resumen">1. Resumen Ejecutivo</h1>
+
+    <h2>1.1 Objetivo del Proyecto</h2>
+    <p>Sistema web de monitoreo y control en tiempo real de cámaras frigoríficas de maduración de bananas, desarrollado para Almar SRL. El sistema centraliza la información de múltiples sensores y permite la visualización y control remoto desde dispositivos móviles y de escritorio.</p>
+
+    <h2>1.2 Alcance</h2>
+    <ul>
+        <li><strong>30 cámaras frigoríficas</strong> monitoreadas</li>
+        <li><strong>60 sensores NUONUO</strong> (CO₂ y Etileno)</li>
+        <li><strong>Sistema de autenticación</strong> con roles diferenciados</li>
+        <li><strong>Dashboard responsive</strong> con actualización automática</li>
+        <li><strong>Control de setpoints</strong> para operarios autorizados</li>
+    </ul>
+
+    <h2>1.3 Tecnologías Principales</h2>
+    <ul>
+        <li><strong>Backend:</strong> ASP.NET Core 8.0 MVC</li>
+        <li><strong>Base de Datos:</strong> SQLite con Entity Framework Core</li>
+        <li><strong>Frontend:</strong> Razor Views, Tailwind CSS, jQuery</li>
+        <li><strong>APIs Externas:</strong> Sitrad PRO API, NUONUO API</li>
+    </ul>
+
+    <h1 id="descripcion">2. Descripción del Proyecto</h1>
+
+    <h2>2.1 Contexto</h2>
+    <p>El proyecto surge de la necesidad de centralizar el monitoreo de variables críticas en cámaras de maduración de bananas, que anteriormente se consultaban de forma manual y distribuida en interfaces locales (HMI).</p>
+
+    <h2>2.2 Problema Resuelto</h2>
+    <ul>
+        <li><strong>Antes:</strong> Consultas manuales en interfaces locales, coordinación distribuida, falta de histórico</li>
+        <li><strong>Después:</strong> Dashboard centralizado, acceso remoto, actualización en tiempo real, registro histórico (planificado)</li>
+    </ul>
+
+    <h2>2.3 Variables Monitoreadas</h2>
+    <p>Por cada cámara se monitorean:</p>
+    <ul>
+        <li><strong>Temperatura de aire</strong> (Sitrad)</li>
+        <li><strong>Temperatura de pulpa</strong> (Sitrad)</li>
+        <li><strong>Humedad relativa</strong> (Sitrad)</li>
+        <li><strong>Estado del evaporador</strong> (Sitrad)</li>
+        <li><strong>CO₂</strong> (NUONUO)</li>
+        <li><strong>Etileno</strong> (NUONUO)</li>
+        <li><strong>Setpoints SET1 y SET3</strong> (Sitrad)</li>
+    </ul>
+
+    <h1 id="arquitectura">3. Arquitectura del Sistema</h1>
+
+    <h2>3.1 Arquitectura de Tres Capas</h2>
+    <p>El sistema se estructura en tres capas principales:</p>
+
+    <h3>Capa 1: Sensado y Control (Hardware)</h3>
+    <ul>
+        <li>Cámaras frigoríficas (30 unidades)</li>
+        <li>Sensores Sitrad (temperatura, humedad, evaporador)</li>
+        <li>Controladores Sitrad (concentradores de datos)</li>
+        <li>Sensores NUONUO (60 sensores: CO₂ y Etileno)</li>
+    </ul>
+
+    <h3>Capa 2: Backend (ASP.NET Core MVC)</h3>
+    <p><strong>Controladores:</strong></p>
+    <ul>
+        <li><code>SitradController</code>: Dashboard principal, obtención de datos, actualización de setpoints</li>
+        <li><code>AccountController</code>: Autenticación, registro, gestión de sesiones</li>
+        <li><code>HomeController</code>: Página de inicio</li>
+    </ul>
+
+    <p><strong>Servicios:</strong></p>
+    <ul>
+        <li><code>AuthService</code>: Gestión de usuarios, autenticación, hash de contraseñas</li>
+        <li><code>SitradApiClient</code>: Cliente HTTP para API de Sitrad PRO</li>
+        <li><code>NuonoApiClient</code>: Cliente HTTP para API de NUONUO</li>
+    </ul>
+
+    <p><strong>Modelos:</strong></p>
+    <ul>
+        <li><code>User</code>: Modelo de usuario con roles</li>
+        <li><code>CameraViewModel</code>: Modelo de vista para datos de cámaras</li>
+        <li><code>UserRole</code>: Enum (Operario, Visualizador)</li>
+    </ul>
+
+    <p><strong>Persistencia:</strong></p>
+    <ul>
+        <li><code>AppDbContext</code>: Contexto de Entity Framework Core</li>
+        <li>SQLite (<code>sitrad.db</code>): Base de datos local</li>
+    </ul>
+
+    <h3>Capa 3: Presentación (Dashboard Web)</h3>
+    <p><strong>Vistas Razor:</strong></p>
+    <ul>
+        <li><code>Login.cshtml</code>: Formulario de autenticación</li>
+        <li><code>Register.cshtml</code>: Formulario de registro</li>
+        <li><code>Index.cshtml</code>: Dashboard principal con tabla de cámaras</li>
+        <li><code>_Layout.cshtml</code>: Layout compartido</li>
+    </ul>
+
+    <p><strong>Frontend:</strong></p>
+    <ul>
+        <li>jQuery 3.6.0: Manipulación DOM y AJAX</li>
+        <li>Tailwind CSS: Estilos responsive</li>
+        <li>Iconify: Iconos SVG</li>
+        <li>Actualización automática cada 5 segundos</li>
+    </ul>
+
+    <h2>3.2 Flujo de Datos</h2>
+    <pre>Sensores → Controladores → APIs Externas → Backend → Frontend → Usuario</pre>
+    <ol>
+        <li>Sensores generan lecturas físicas</li>
+        <li>Controladores Sitrad/NUONUO envían datos a APIs</li>
+        <li>Backend consume APIs mediante HttpClient</li>
+        <li>Servicios combinan y procesan datos</li>
+        <li>Controladores renderizan vistas</li>
+        <li>Frontend actualiza dashboard mediante AJAX</li>
+    </ol>
+
+    <h2>3.3 Flujo de Autenticación</h2>
+    <pre>Usuario → Login → AccountController → AuthService → SQLite → Sesión → Dashboard</pre>
+    <ol>
+        <li>Usuario accede y es redirigido a login</li>
+        <li><code>AccountController</code> recibe credenciales</li>
+        <li><code>AuthService</code> valida contra base de datos</li>
+        <li>Si es válido, se crea sesión con UserId y Role</li>
+        <li>Redirección al dashboard con permisos según rol</li>
+        <li>Validación de permisos en cada acción</li>
+    </ol>
+
+    <h1 id="stack">4. Stack Tecnológico</h1>
+
+    <h2>4.1 Backend</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tecnología</th>
+                <th>Versión</th>
+                <th>Propósito</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>.NET</td>
+                <td>8.0</td>
+                <td>Framework principal</td>
+            </tr>
+            <tr>
+                <td>ASP.NET Core MVC</td>
+                <td>8.0</td>
+                <td>Arquitectura web</td>
+            </tr>
+            <tr>
+                <td>Entity Framework Core</td>
+                <td>8.0.0</td>
+                <td>ORM para SQLite</td>
+            </tr>
+            <tr>
+                <td>SQLite</td>
+                <td>3.x</td>
+                <td>Base de datos local</td>
+            </tr>
+            <tr>
+                <td>Newtonsoft.Json</td>
+                <td>13.0.3</td>
+                <td>Serialización JSON</td>
+            </tr>
+            <tr>
+                <td>HttpClient</td>
+                <td>Built-in</td>
+                <td>Cliente HTTP para APIs</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>4.2 Frontend</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tecnología</th>
+                <th>Versión</th>
+                <th>Propósito</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Razor Views</td>
+                <td>Built-in</td>
+                <td>Motor de vistas del servidor</td>
+            </tr>
+            <tr>
+                <td>Tailwind CSS</td>
+                <td>CDN</td>
+                <td>Framework CSS utility-first</td>
+            </tr>
+            <tr>
+                <td>jQuery</td>
+                <td>3.6.0</td>
+                <td>Manipulación DOM y AJAX</td>
+            </tr>
+            <tr>
+                <td>Iconify</td>
+                <td>CDN</td>
+                <td>Iconos SVG</td>
+            </tr>
+            <tr>
+                <td>Bootstrap</td>
+                <td>5.x</td>
+                <td>Componentes UI (parcial)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>4.3 Seguridad</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tecnología</th>
+                <th>Propósito</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SHA256</td>
+                <td>Hash de contraseñas</td>
+            </tr>
+            <tr>
+                <td>HTTP Sessions</td>
+                <td>Gestión de estado de autenticación</td>
+            </tr>
+            <tr>
+                <td>Cookies HTTP-only</td>
+                <td>Prevención de XSS</td>
+            </tr>
+            <tr>
+                <td>Basic Auth</td>
+                <td>Autenticación con API externa</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h1 id="funcionalidades">5. Funcionalidades Implementadas</h1>
+
+    <h2>5.1 Autenticación y Autorización</h2>
+    <p><span class="checkmark">✅</span> <strong>Sistema de login/registro</strong></p>
+    <ul>
+        <li>Formulario de login con validación</li>
+        <li>Registro de nuevos usuarios</li>
+        <li>Hash SHA256 de contraseñas</li>
+        <li>Sesiones con timeout de 20 minutos</li>
+    </ul>
+
+    <p><span class="checkmark">✅</span> <strong>Roles de usuario</strong></p>
+    <ul>
+        <li><strong>Operario:</strong> Puede modificar setpoints y parámetros</li>
+        <li><strong>Visualizador:</strong> Solo lectura, sin permisos de modificación</li>
+    </ul>
+
+    <h2>5.2 Dashboard</h2>
+    <p><span class="checkmark">✅</span> <strong>Visualización en tiempo real</strong></p>
+    <ul>
+        <li>Tabla de cámaras con todas las variables</li>
+        <li>Actualización automática cada 5 segundos</li>
+        <li>Indicadores visuales de estado</li>
+    </ul>
+
+    <h2>5.3 Control de Setpoints</h2>
+    <p><span class="checkmark">✅</span> <strong>Modificación de SET1 y SET3</strong></p>
+    <ul>
+        <li>Solo para usuarios con rol Operario</li>
+        <li>Validación de formato numérico</li>
+        <li>Sistema de reintentos automáticos</li>
+        <li>Confirmación visual mediante toasts</li>
+    </ul>
+
+    <h2>5.6 Funcionalidades Planificadas</h2>
+    <ul>
+        <li><span class="pending">⏳</span> Historial de lecturas (logs)</li>
+        <li><span class="pending">⏳</span> Agregaciones estadísticas (mínimo, máximo, promedio)</li>
+        <li><span class="pending">⏳</span> Sistema de alertas avanzado con notificaciones</li>
+        <li><span class="pending">⏳</span> Reportes exportables (PDF, Excel)</li>
+        <li><span class="pending">⏳</span> Buffer local para cortes de red</li>
+    </ul>
+
+    <h1 id="modelo">7. Modelo de Datos</h1>
+
+    <h2>7.1 Tabla Users</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Restricciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Id</td>
+                <td>INTEGER</td>
+                <td>Identificador único</td>
+                <td>PK, AutoIncrement</td>
+            </tr>
+            <tr>
+                <td>Username</td>
+                <td>TEXT</td>
+                <td>Nombre de usuario</td>
+                <td>NOT NULL, UNIQUE, Case-insensitive</td>
+            </tr>
+            <tr>
+                <td>PasswordHash</td>
+                <td>TEXT</td>
+                <td>Hash SHA256 de la contraseña</td>
+                <td>NOT NULL</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>TEXT</td>
+                <td>Rol del usuario</td>
+                <td>NOT NULL, Enum: "Operario" o "Visualizador"</td>
+            </tr>
+            <tr>
+                <td>CreatedAt</td>
+                <td>TEXT</td>
+                <td>Fecha de creación</td>
+                <td>NOT NULL, Default: datetime('now')</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h1 id="configuracion">8. Configuración y Despliegue</h1>
+
+    <h2>8.1 Requisitos Previos</h2>
+    <ul>
+        <li><strong>.NET 8.0 SDK</strong> o superior</li>
+        <li><strong>Navegador web moderno</strong> (Chrome, Firefox, Edge, Safari)</li>
+        <li><strong>Acceso a la red</strong> donde está la API de Sitrad PRO</li>
+        <li><strong>NGROK</strong> (opcional, para exposición a Internet)</li>
+    </ul>
+
+    <h2>8.2 Configuración Inicial</h2>
+    <p><strong>Paso 1: Clonar repositorio</strong></p>
+    <pre><code>git clone https://github.com/GonzaloBelvisi/CloudPepeNew.git
+cd CloudPepeNew-main</code></pre>
+
+    <p><strong>Paso 2: Configurar appsettings.json</strong></p>
+    <pre><code>cp appsettings.example.json appsettings.json</code></pre>
+
+    <h1 id="seguridad">9. Seguridad</h1>
+
+    <h2>9.1 Autenticación</h2>
+    <ul>
+        <li><strong>Hash de contraseñas:</strong> SHA256 (no se almacenan en texto plano)</li>
+        <li><strong>Sesiones:</strong> Cookies HTTP-only y seguras</li>
+        <li><strong>Timeout:</strong> 20 minutos de inactividad</li>
+    </ul>
+
+    <h2>9.2 Autorización</h2>
+    <ul>
+        <li><strong>Control de acceso basado en roles:</strong> Validación en servidor y cliente</li>
+        <li><strong>Código de invitación:</strong> Previene registro no autorizado de operarios</li>
+        <li><strong>Validación de permisos:</strong> En cada acción que requiere privilegios</li>
+    </ul>
+
+    <h1 id="diagramas">10. Diagramas</h1>
+
+    <p>El proyecto incluye un diagrama PlantUML completo en <code>diagrama-arquitectura-completa.puml</code> que muestra:</p>
+    <ul>
+        <li>Las 3 capas del sistema</li>
+        <li>Componentes y sus relaciones</li>
+        <li>Flujos de datos y autenticación</li>
+        <li>APIs externas y configuración</li>
+    </ul>
+
+    <h1 id="uso">11. Guías de Uso</h1>
+
+    <h2>11.1 Primer Acceso</h2>
+    <ol>
+        <li>Abrir navegador en <code>http://localhost:5220</code></li>
+        <li>Serás redirigido automáticamente a <code>/Account/Login</code></li>
+        <li><strong>Usuario inicial:</strong> <code>admin</code></li>
+        <li><strong>Contraseña:</strong> La configurada en <code>appsettings.json</code> bajo <code>AuthSettings:AdminPassword</code></li>
+    </ol>
+
+    <h1 id="referencias">12. Referencias Técnicas</h1>
+
+    <h2>12.1 Documentación Oficial</h2>
+    <ul>
+        <li><strong>ASP.NET Core:</strong> https://learn.microsoft.com/es-es/aspnet/core/</li>
+        <li><strong>Entity Framework Core:</strong> https://learn.microsoft.com/es-es/ef/core/</li>
+        <li><strong>SQLite:</strong> https://www.sqlite.org/docs.html</li>
+        <li><strong>Tailwind CSS:</strong> https://tailwindcss.com/docs</li>
+        <li><strong>jQuery:</strong> https://api.jquery.com/</li>
+    </ul>
+
+    <div class="footer">
+        <p><strong>Versión del documento:</strong> 1.0.0</p>
+        <p><strong>Última actualización:</strong> Diciembre 2025</p>
+        <p><strong>Autor:</strong> Gonzalo Belvisi</p>
+        <p><strong>Proyecto:</strong> Monitoreo IoT de Cámaras de Maduración - Almar SRL</p>
+    </div>
+
+    <script>
+        // Agregar funcionalidad de impresión mejorada
+        window.onload = function() {
+            // Si se está imprimiendo, ajustar estilos
+            window.matchMedia('print').addListener(function(mql) {
+                if (mql.matches) {
+                    document.body.style.fontSize = '12pt';
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+

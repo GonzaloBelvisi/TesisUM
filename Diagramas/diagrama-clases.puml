@@ -1,0 +1,119 @@
+@startuml Diagrama de Clases - Sistema Sitrad Web Interface
+
+skinparam backgroundColor #FAFAFA
+skinparam roundcorner 10
+skinparam shadowing true
+
+title Diagrama de Clases - Sitrad Web Interface
+
+' ==========================================
+' MODELOS
+' ==========================================
+class User {
+  +int Id
+  +string Username
+  +string PasswordHash
+  +UserRole Role
+  +DateTime CreatedAt
+}
+
+enum UserRole {
+  Operario
+  Visualizador
+}
+
+class CameraViewModel {
+  +int InstrumentId
+  +string CameraName
+  +string Temperature
+  +string Humidity
+  +string PulpTemp
+  +string EvaporatorTemp
+  +string Set1
+  +string Set3
+  +string co2
+  +string etileno
+}
+
+' ==========================================
+' SERVICIOS
+' ==========================================
+class AuthService {
+  -AppDbContext _context
+  -IConfiguration _config
+  --
+  +RegisterUser(username, password, role, invitationCode)
+  +Authenticate(username, password)
+  +ValidateInvitationCode(code)
+  +GetUserByUsername(username)
+  +DeleteUser(id)
+  +ListAllUsers()
+  -ComputeSha256Hash(input)
+}
+
+' ==========================================
+' CONTROLADORES
+' ==========================================
+class AccountController {
+  -AuthService _authService
+  --
+  +Login() : IActionResult
+  +Login(LoginModel) : IActionResult
+  +Register() : IActionResult
+  +Register(RegisterModel) : IActionResult
+  +Logout() : IActionResult
+}
+
+class SitradController {
+  --
+  +Index() : IActionResult
+  +GetDashboardData() : JsonResult
+  +UpdateFunctionValue(instrumentId, functionName, value) : JsonResult
+  -CheckSession()
+  -CheckRole()
+}
+
+' ==========================================
+' DATOS
+' ==========================================
+class AppDbContext {
+  +DbSet<User> Users
+  --
+  +OnModelCreating(ModelBuilder)
+}
+
+' ==========================================
+' RELACIONES
+' ==========================================
+User "1" - "1" UserRole : tiene
+AuthService "1" --> "1" AppDbContext : usa
+AccountController "1" --> "1" AuthService : usa
+AppDbContext "1" --> "*" User : contiene
+
+note right of User
+  Tabla Users en SQLite
+  Índice único en Username
+  Role como string en BD
+end note
+
+note right of AuthService
+  Hash SHA256 para contraseñas
+  Validación de códigos de invitación
+  Gestión de roles
+end note
+
+note bottom of AccountController
+  Gestiona sesiones HTTP
+  Cookies HTTP-only
+  Timeout configurable
+end note
+
+note bottom of SitradController
+  Verifica sesión activa
+  Control de acceso por roles
+  Integración con APIs externas
+end note
+
+@enduml
+
+

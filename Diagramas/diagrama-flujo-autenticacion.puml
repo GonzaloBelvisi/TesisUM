@@ -1,0 +1,70 @@
+@startuml Flujo de Autenticación y Registro
+
+skinparam backgroundColor #FAFAFA
+skinparam roundcorner 10
+skinparam activity {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+  FontSize 12
+}
+
+title Flujo de Autenticación y Control de Acceso
+
+start
+
+if (Usuario en sesión?) then (Sí)
+  :Acceso al dashboard permitido;
+  if (Rol del usuario?) then (Operario)
+    :Mostrar controles completos;
+    :Permitir modificación de setpoints;
+  else (Visualizador)
+    :Mostrar controles deshabilitados;
+    :Solo visualización;
+  endif
+  stop
+else (No)
+  :Redirigir a /Account/Login;
+  if (Acción?) then (Login)
+    :Usuario ingresa credenciales;
+    :AuthService.Authenticate();
+    :Validar hash SHA256;
+    if (Credenciales válidas?) then (Sí)
+      :Crear sesión;
+      :Establecer cookie HTTP-only;
+      :Redirigir al dashboard;
+      stop
+    else (No)
+      :Mostrar error;
+      stop
+    endif
+  else (Registro)
+    :Usuario ingresa datos;
+    :Selecciona rol;
+    if (Rol seleccionado?) then (Operario)
+      :Solicitar código de invitación;
+      if (Código válido?) then (Sí)
+        :AuthService.RegisterUser();
+        :Generar hash SHA256;
+        :Guardar en SQLite;
+        :Mostrar éxito;
+        :Redirigir a Login;
+        stop
+      else (No)
+        :Mostrar error;
+        stop
+      endif
+    else (Visualizador)
+      :No requiere código;
+      :AuthService.RegisterUser();
+      :Generar hash SHA256;
+      :Guardar en SQLite;
+      :Mostrar éxito;
+      :Redirigir a Login;
+      stop
+    endif
+  endif
+endif
+
+@enduml
+
+

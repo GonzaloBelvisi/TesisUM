@@ -1,0 +1,64 @@
+@startuml Modelo de Base de Datos
+
+skinparam backgroundColor #FAFAFA
+skinparam roundcorner 15
+skinparam linetype ortho
+
+title Modelo de Base de Datos - SQLite
+
+database "sitrad.db" {
+
+  entity "Users" as users {
+    * **Id** : INTEGER <<PK, AI>>
+    --
+    * **Username** : TEXT <<UNIQUE, NOT NULL>>
+    * **PasswordHash** : TEXT <<NOT NULL>>
+    * **Role** : TEXT <<NOT NULL>>
+    * **CreatedAt** : TEXT <<DEFAULT: datetime('now')>>
+    ..
+    Índice único: IX_Users_Username
+    Role almacenado como string
+  }
+
+  note right of users
+    **Configuración Entity Framework:**
+    - HasIndex(u => u.Username).IsUnique()
+    - Property(u => u.Role).HasConversion<string>()
+    - Property(u => u.CreatedAt).HasDefaultValueSql("datetime('now')")
+    
+    **Roles posibles:**
+    - "Operario"
+    - "Visualizador"
+    
+    **Seguridad:**
+    - PasswordHash: SHA256 en Base64
+    - No se almacenan contraseñas en texto plano
+  end note
+}
+
+entity "Measurement" as measurement <<futuro>> {
+  * **Id** : INTEGER <<PK, AI>>
+  --
+  * **CameraId** : INTEGER
+  * **VariableType** : TEXT
+  * **Value** : REAL
+  * **Unit** : TEXT
+  * **Timestamp** : TEXT
+  ..
+  Para almacenar historial
+  de lecturas (planificado)
+}
+
+users ||--o{ measurement : "1..*"
+
+note top of measurement
+  **Tabla futura para historial**
+  - Almacenará lecturas históricas
+  - Por cámara y tipo de variable
+  - Agregaciones: min, max, promedio
+  - Consultas por rangos de fechas
+end note
+
+@enduml
+
+

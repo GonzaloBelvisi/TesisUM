@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documento de Defensa - Monitoreo IoT Cámaras de Maduración</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+            font-size: 11pt;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 40px 50px;
+        }
+        
+        @media screen {
+            body {
+                padding: 40px 50px;
+                margin: 20px auto;
+            }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2c3e50;
+        }
+        
+        .header h1 {
+            font-size: 18pt;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .header h2 {
+            font-size: 16pt;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+        
+        .header .meta {
+            font-size: 10pt;
+            color: #7f8c8d;
+            margin-top: 15px;
+        }
+        
+        h1 {
+            font-size: 16pt;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            page-break-after: avoid;
+        }
+        
+        h2 {
+            font-size: 14pt;
+            color: #34495e;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            font-size: 12pt;
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        h4 {
+            font-size: 11pt;
+            color: #666;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        p {
+            margin: 8px 0;
+            text-align: justify;
+            text-indent: 0;
+        }
+        
+        ul, ol {
+            margin: 10px 0 10px 25px;
+            padding-left: 0;
+        }
+        
+        li {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+        
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .question-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        
+        .answer-box {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 12px;
+            margin: 8px 0 15px 20px;
+            border-radius: 4px;
+        }
+        
+        .key-points {
+            background-color: #e7f3ff;
+            border: 2px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .key-points h3 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10pt;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+        }
+        
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            margin-left: 0;
+        }
+        
+        .toc li {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .toc a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .summary {
+            background-color: #fff9e6;
+            border: 2px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .summary h2 {
+            color: #d68910;
+            border-bottom: 2px solid #f39c12;
+        }
+        
+        @media print {
+            .page-break {
+                page-break-before: always;
+            }
+            
+            body {
+                font-size: 10pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Facultad de Ingeniería</h1>
+        <h2>Monitoreo IoT de cámaras de maduración en Almar SRL</h2>
+        <div class="meta">
+            <p><strong>Director de tesis:</strong> Pablo Navas Torena</p>
+            <p><strong>Estudiante:</strong> Gonzalo Belvisi</p>
+            <p><strong>Tipo de documento:</strong> Informe para Evaluación y Defensa</p>
+        </div>
+    </div>
+
+    <div class="summary">
+        <h2>📋 Resumen Ejecutivo</h2>
+        <p><strong>Problema abordado:</strong> Almar SRL requería centralizar el monitoreo de 30 cámaras frigoríficas de maduración de bananas, donde actualmente las lecturas se consultan en interfaces locales (HMI) de forma distribuida y manual, ralentizando la toma de decisiones.</p>
+        
+        <p><strong>Solución implementada:</strong> Plataforma web de monitoreo IoT que integra datos de múltiples fuentes (Sitrad PRO y sensores NUONUO de CO₂ y etileno) en un dashboard único, accesible desde dispositivos móviles y de escritorio, con actualización en tiempo real y sistema de autenticación por roles.</p>
+        
+        <p><strong>Arquitectura:</strong> Sistema de tres capas: (1) Capa física (sensores y controladores), (2) Backend ASP.NET Core 9.0 MVC con SQLite, (3) Dashboard web responsive con Tailwind CSS y jQuery.</p>
+        
+        <p><strong>Resultados:</strong> Prototipo funcional que demuestra valor operativo, reduciendo tiempo de reacción ante desvíos y aportando trazabilidad. Funcionalidades implementadas: visualización en tiempo real, semáforo de temperatura de pulpa, autenticación por roles, modificación de setpoints para operarios autorizados.</p>
+    </div>
+
+    <div class="toc">
+        <h2>📑 Índice del Documento</h2>
+        <ul>
+            <li><a href="#objetivo">1. Objetivo y Alcance del Proyecto</a></li>
+            <li><a href="#arquitectura">2. Arquitectura de la Solución</a></li>
+            <li><a href="#tecnologias">3. Stack Tecnológico y Justificación</a></li>
+            <li><a href="#desafios">4. Desafíos Técnicos y Resoluciones</a></li>
+            <li><a href="#resultados">5. Resultados y Funcionalidades Implementadas</a></li>
+            <li><a href="#preguntas">6. Preguntas Potenciales de Defensa</a></li>
+            <li><a href="#conclusiones">7. Conclusiones y Trabajo Futuro</a></li>
+        </ul>
+    </div>
+
+    <h1 id="objetivo">1. Objetivo y Alcance del Proyecto</h1>
+    
+    <div class="key-points">
+        <h3>Objetivo Principal</h3>
+        <p>Diseñar e implementar una plataforma web de monitoreo IoT que centralice y visualice la información de todas las cámaras de maduración de Almar SRL, integrando datos heterogéneos (Sitrad PRO y NUONUO) en un dashboard único, accesible y confiable.</p>
+    </div>
+
+    <h3>1.1 Contexto del Problema</h3>
+    <p>Almar SRL opera 30 cámaras frigoríficas para la maduración de bananas (aproximadamente 250.000 unidades por cámara). El proceso requiere monitoreo constante de variables críticas:</p>
+    <ul>
+        <li><strong>Temperatura de aire y temperatura de pulpa:</strong> Variable crítica que indica el estado interno de la fruta</li>
+        <li><strong>Humedad relativa:</strong> Controla el ambiente de maduración</li>
+        <li><strong>Estado del evaporador:</strong> Equipo de climatización</li>
+        <li><strong>Niveles de CO₂ y etileno:</strong> Gases que influyen en el proceso de maduración</li>
+    </ul>
+    
+    <p><strong>Situación actual:</strong> Las lecturas se consultan en interfaces locales (HMI) de forma manual y distribuida, lo que ralentiza la toma de decisiones y dificulta construir un histórico confiable para análisis y ajustes del proceso.</p>
+
+    <h3>1.2 Alcance del Proyecto</h3>
+    <p><strong>Incluye:</strong></p>
+    <ul>
+        <li>Integración con APIs existentes (Sitrad PRO y NUONUO Refrigeration)</li>
+        <li>Desarrollo de dashboard web responsive con actualización en tiempo real</li>
+        <li>Sistema de autenticación y autorización por roles (Operario/Visualizador)</li>
+        <li>Semáforo de temperatura de pulpa con umbrales configurables</li>
+        <li>Modificación de setpoints para operarios autorizados</li>
+        <li>Despliegue on-premises con exposición segura a Internet (NGROK)</li>
+    </ul>
+    
+    <p><strong>No incluye (trabajo futuro):</strong></p>
+    <ul>
+        <li>Buffer local completo para cortes de red prolongados</li>
+        <li>Historial completo con agregaciones avanzadas (mínimos, máximos, promedios)</li>
+        <li>Sistema de alertas externas (correo, mensajería)</li>
+        <li>Reportes exportables (PDF, Excel)</li>
+                </ul>
+
+    <h1 id="arquitectura">2. Arquitectura de la Solución</h1>
+    
+    <div class="key-points">
+        <h3>Arquitectura de Tres Capas</h3>
+        <p>La solución se estructura en tres capas claramente separadas, facilitando mantenibilidad, escalabilidad y evolución futura.</p>
+            </div>
+
+    <h3>2.1 Capa de Sensado y Control (Capa Física)</h3>
+    <p><strong>Componentes:</strong></p>
+    <ul>
+        <li><strong>30 Cámaras frigoríficas:</strong> Cada una con capacidad de ~250.000 bananas</li>
+        <li><strong>Sensores internos Sitrad:</strong> Temperatura de aire, temperatura de pulpa, humedad relativa, estado del evaporador</li>
+        <li><strong>60 Sensores NUONUO:</strong> 30 para CO₂ y 30 para etileno (2 sensores por cámara)</li>
+        <li><strong>Controladores Sitrad:</strong> Concentran señales de sensores y las exponen vía Sitrad PRO</li>
+        <li><strong>HMI (Human-Machine Interface):</strong> Interfaz local y concentrador edge para sensores NUONUO</li>
+        <li><strong>Gateway PUSR (USR-TCP232-304):</strong> Puente RS485 ↔ Red para conectar sensores al cloud del proveedor</li>
+    </ul>
+    
+    <p><strong>Flujo de datos:</strong> Sensores físicos → Controladores/HMI → RS485 → Gateway PUSR → Cloud del proveedor (NUONUO) o Sitrad PRO API</p>
+
+    <h3>2.2 Capa de Adquisición y Lógica de Negocio (Backend)</h3>
+    <p><strong>Implementación:</strong> ASP.NET Core 9.0 MVC ejecutándose en servidor local (on-premises)</p>
+    
+    <h4>Componentes principales:</h4>
+    <ul>
+        <li><strong>SitradApiClient:</strong> Consulta periódica a Sitrad PRO API (/instruments, /instruments/{id}/values, /instruments/{id}/functions)</li>
+        <li><strong>NuonuoApiClient:</strong> Consume API del proveedor para CO₂ y etileno, vinculando sensores por alias/IMEI</li>
+        <li><strong>Servicios de dominio:</strong> Combinan lecturas, aplican reglas de negocio (semáforos, umbrales), implementan tolerancia a fallos</li>
+        <li><strong>AuthService:</strong> Gestión de usuarios, autenticación SHA256, validación de códigos de invitación, control de roles</li>
+        <li><strong>AppDbContext (Entity Framework Core):</strong> Persistencia en SQLite local (tabla Users, tabla Measurement planificada)</li>
+    </ul>
+    
+    <p><strong>Controladores MVC:</strong></p>
+    <ul>
+        <li><strong>SitradController:</strong> Dashboard principal, actualización de datos, modificación de setpoints</li>
+        <li><strong>AccountController:</strong> Login, registro, logout, gestión de sesiones</li>
+    </ul>
+
+    <h3>2.3 Capa de Presentación (Dashboard Web)</h3>
+    <p><strong>Tecnologías:</strong></p>
+    <ul>
+        <li><strong>Razor Views:</strong> Renderizado server-side (Index.cshtml, Login.cshtml, Register.cshtml)</li>
+        <li><strong>Tailwind CSS:</strong> Diseño responsive mobile-first</li>
+        <li><strong>jQuery 3.6.0:</strong> Actualización automática cada 5 segundos mediante AJAX</li>
+                </ul>
+    
+    <p><strong>Funcionalidades:</strong></p>
+    <ul>
+        <li>Visualización de tarjetas por cámara con todas las variables</li>
+        <li>Semáforo de temperatura de pulpa (amarillo 17°C, naranja 18°C, rojo ≥19°C)</li>
+        <li>Interfaz adaptativa según rol (Operario: controles habilitados, Visualizador: solo consulta)</li>
+        <li>Notificaciones toast para feedback de acciones</li>
+                </ul>
+
+    <h3>2.4 Justificación de la Arquitectura</h3>
+    <ul>
+        <li><strong>Separación de responsabilidades:</strong> Reduce acoplamiento, facilita evolución independiente</li>
+        <li><strong>Escalabilidad:</strong> Backend como punto único de integración, fácil agregar cámaras/sensores</li>
+        <li><strong>Mantenibilidad:</strong> Organización clara en controladores, servicios y modelos</li>
+        <li><strong>Seguridad:</strong> Autenticación centralizada, exposición controlada vía HTTPS</li>
+        <li><strong>Reutilización:</strong> Contrato HTTP/JSON permite futuras apps móviles nativas</li>
+                </ul>
+
+    <h1 id="tecnologias">3. Stack Tecnológico y Justificación</h1>
+    
+    <table>
+        <tr>
+            <th>Categoría</th>
+            <th>Tecnología</th>
+            <th>Justificación</th>
+        </tr>
+        <tr>
+            <td>Backend Framework</td>
+            <td>ASP.NET Core 9.0 MVC</td>
+            <td>Framework maduro, soporte multiplataforma, excelente integración con Entity Framework, fácil despliegue</td>
+        </tr>
+        <tr>
+            <td>ORM</td>
+            <td>Entity Framework Core 9.0</td>
+            <td>Integración nativa con .NET, soporte SQLite, migraciones automáticas, código-first</td>
+        </tr>
+        <tr>
+            <td>Base de Datos</td>
+            <td>SQLite</td>
+            <td>Sin servidor externo necesario, archivo local, ideal para despliegue on-premises simplificado</td>
+        </tr>
+        <tr>
+            <td>Frontend CSS</td>
+            <td>Tailwind CSS</td>
+            <td>Utility-first, diseño responsive eficiente, mobile-first por defecto</td>
+        </tr>
+        <tr>
+            <td>JavaScript</td>
+            <td>jQuery 3.6.0</td>
+            <td>Manipulación DOM simple, AJAX fácil de implementar, ampliamente soportado</td>
+        </tr>
+        <tr>
+            <td>Seguridad</td>
+            <td>Hash SHA256, Sesiones HTTP-only</td>
+            <td>Almacenamiento seguro de contraseñas, cookies protegidas, estándar de la industria</td>
+        </tr>
+        <tr>
+            <td>Despliegue</td>
+            <td>Kestrel + NGROK</td>
+            <td>Servidor web integrado, túnel HTTPS seguro para acceso externo sin configuración compleja de red</td>
+        </tr>
+    </table>
+
+    <h1 id="desafios">4. Desafíos Técnicos y Resoluciones</h1>
+    
+    <h3>4.1 Heterogeneidad de Fuentes de Datos</h3>
+    <p><strong>Desafío:</strong> Integrar datos de Sitrad PRO (temperatura, humedad, evaporador, setpoints) con NUONUO (CO₂, etileno), cada uno con su propia API y modelo de datos.</p>
+    <p><strong>Resolución:</strong> Modelo de dominio unificado (CameraViewModel), clientes de API específicos que encapsulan diferencias, normalización de unidades y campos antes de construir la vista.</p>
+    
+    <h3>4.2 Restricciones de Red y Acceso a Sitrad</h3>
+    <p><strong>Desafío:</strong> Restricciones de red por infraestructura de terceros (Númina), dificultando acceso estable a la API y exposición para pruebas remotas.</p>
+    <p><strong>Resolución:</strong> Identificación de puertos/endpoints críticos, estrategia de acceso que minimiza dependencias, uso de túnel HTTPS (NGROK) para acceso externo controlado.</p>
+    
+    <h3>4.3 Coordinación con Proveedor NUONUO</h3>
+    <p><strong>Desafío:</strong> Alta y mapeo de sensores en cloud del proveedor requería coordinación manual (WeChat), con riesgos de demoras e inconsistencias.</p>
+    <p><strong>Resolución:</strong> Esquema explícito de identificación (alias/IMEI ↔ cámara ↔ channel), validación sensor por sensor, procedimiento estandarizado de alta en Intelligent Security Cloud Platform.</p>
+    
+    <h3>4.4 Integración Física y Parámetros de Comunicación</h3>
+    <p><strong>Desafío:</strong> Conectar 60 sensores vía RS485, configurar HMI y gateway PUSR, asegurar parámetros alineados (baud rate, timeouts, ciclos).</p>
+    <p><strong>Resolución:</strong> Configuración y estabilización de parámetros en HMI (modo transferencia, frecuencia, baud rate, timeouts), validación extremo a extremo en etapas, consolidación del pipeline completo.</p>
+    
+    <h3>4.5 Cortes Eléctricos y Despliegue On-Premises vs. Nube</h3>
+    <p><strong>Desafío:</strong> Cortes eléctricos ocasionales, decisión entre despliegue local o en la nube.</p>
+    <p><strong>Resolución:</strong> Enfoque híbrido on-premises porque: (1) durante apagones, las cámaras también se detienen, no hay datos relevantes que levantar, (2) preferencia operativa del cliente por control local, (3) costo/beneficio favorable, (4) mantenimiento de posibilidad de exposición controlada para futuras integraciones.</p>
+    
+    <h3>4.6 Seguridad y Exposición hacia Internet</h3>
+    <p><strong>Desafío:</strong> Acceso desde fuera de red interna sin comprometer seguridad.</p>
+    <p><strong>Resolución:</strong> Servicio en red interna, exposición vía NGROK (HTTPS extremo a extremo), autenticación con usuarios/contraseñas (SHA256), sesiones HTTP-only, control de acceso por roles con código de invitación para operarios.</p>
+    
+    <h3>4.7 Usabilidad del Dashboard</h3>
+    <p><strong>Desafío:</strong> Interpretación rápida del estado de cámaras sin sobrecarga visual.</p>
+    <p><strong>Resolución:</strong> Iteraciones de diseño (v1 fondo claro, v2 fondo oscuro), semáforo intuitivo de temperatura de pulpa, diseño mobile-first, tarjetas por cámara con información priorizada.</p>
+    
+    <h3>4.8 Gestión de Usuarios y Persistencia</h3>
+    <p><strong>Desafío:</strong> Sistema de autenticación robusto, simple de desplegar, sin servidores externos.</p>
+    <p><strong>Resolución:</strong> SQLite con Entity Framework Core, hash SHA256, código de invitación configurable, usuario admin automático, validación de permisos en servidor y cliente.</p>
+
+    <h1 id="resultados">5. Resultados y Funcionalidades Implementadas</h1>
+    
+    <div class="key-points">
+        <h3>✅ Funcionalidades Completamente Implementadas</h3>
+        <ul>
+            <li>Dashboard web responsive accesible desde navegadores desktop y móviles</li>
+            <li>Integración con API de Sitrad PRO para lectura de todas las variables por cámara</li>
+            <li>Integración con API de NUONUO para CO₂ y etileno, con asociación de sensores a cámaras</li>
+            <li>Semáforo de temperatura de pulpa con umbrales configurables por cámara</li>
+            <li>Sistema de autenticación completo con gestión de usuarios y roles (Operario/Visualizador)</li>
+            <li>Gestión de sesiones con expiración y redirección automática</li>
+            <li>Actualización automática del dashboard cada 5 segundos</li>
+            <li>Modificación de setpoints (SET1, SET3) para operarios autorizados</li>
+            <li>Interfaz adaptativa según rol del usuario</li>
+            <li>Despliegue on-premises con exposición segura a Internet vía NGROK</li>
+        </ul>
+    </div>
+
+    <h3>5.1 Valor Demostrado</h3>
+    <p>El prototipo actual ya demuestra valor operativo para Almar SRL:</p>
+    <ul>
+        <li><strong>Reducción de tiempo de reacción:</strong> Visualización centralizada permite detectar desvíos más rápidamente que consultando múltiples HMI locales</li>
+        <li><strong>Trazabilidad:</strong> Base preparada para registrar condiciones de maduración</li>
+        <li><strong>Accesibilidad:</strong> Acceso desde dispositivos móviles facilita supervisión remota</li>
+        <li><strong>Decisiones basadas en datos:</strong> Vista consolidada por cámara facilita comparaciones y ajustes</li>
+    </ul>
+
+    <h3>5.2 Trabajo Futuro (Planificado)</h3>
+    <ul>
+        <li>Buffer local completo para manejo robusto de cortes de red prolongados</li>
+        <li>Historial completo de lecturas con agregaciones (mínimo, máximo, promedio) por intervalos configurables</li>
+        <li>Sistema de alertas avanzado con notificaciones externas (correo, mensajería)</li>
+        <li>Reportes exportables en formatos PDF y Excel</li>
+        <li>Integración con sistemas corporativos (ERP, Microsoft ecosystem)</li>
+    </ul>
+
+    <h1 id="preguntas">6. Preguntas Potenciales de Defensa</h1>
+    
+    <div class="question-box">
+        <h4>❓ Pregunta 1: ¿Por qué elegiste ASP.NET Core sobre otras tecnologías como Node.js o Python?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> ASP.NET Core fue elegido por varias razones técnicas y prácticas: (1) Framework maduro y robusto con excelente soporte para aplicaciones web empresariales, (2) Integración nativa con Entity Framework Core para acceso a datos, (3) Modelo MVC bien estructurado que facilita la organización del código en controladores, servicios y modelos, (4) Soporte multiplataforma permite ejecutar en Windows o Linux según necesidades, (5) Performance excelente para este tipo de aplicaciones, (6) Amplio ecosistema y documentación de Microsoft. Además, dado que Almar SRL utiliza el ecosistema Microsoft, ASP.NET Core facilita futuras integraciones.</p>
+        </div>
+        </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 2: ¿Por qué SQLite y no una base de datos más robusta como PostgreSQL o SQL Server?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> SQLite fue elegido por simplicidad de despliegue y porque se alinea perfectamente con los requisitos del proyecto: (1) No requiere servidor de base de datos externo, reduciendo complejidad de infraestructura, (2) Archivo local facilita backups y mantenimiento, (3) Ideal para despliegue on-premises donde se prefiere control local, (4) Suficiente para el volumen de datos actual (usuarios y futuras lecturas históricas de 30 cámaras), (5) Entity Framework Core soporta migración a otras bases de datos si fuera necesario en el futuro. La decisión priorizó simplicidad operativa sin comprometer funcionalidad.</p>
+        </div>
+        </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 3: ¿Por qué decidiste despliegue on-premises en lugar de cloud (AWS, Azure, etc.)?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> La decisión fue estratégica considerando el contexto operativo: (1) <strong>Disponibilidad durante cortes eléctricos:</strong> Cuando hay apagones, las cámaras y su instrumentación también se detienen, por lo que mantener la app en la nube no agregaría valor durante esos períodos, (2) <strong>Preferencia del cliente:</strong> Almar SRL manifestó preferencia por mantener control local de la infraestructura, (3) <strong>Costo/beneficio:</strong> Disponibilidad de equipos en planta y evitar costos recurrentes de infraestructura cloud, (4) <strong>Seguridad y control:</strong> Datos sensibles del proceso de maduración bajo control directo, (5) <strong>Flexibilidad futura:</strong> La arquitectura permite exposición controlada de APIs para integraciones futuras sin comprometer el núcleo local. Es un enfoque híbrido que balancea control, costo y operatividad.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 4: ¿Cómo garantizas la seguridad del sistema, especialmente la exposición a Internet vía NGROK?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> La seguridad se implementa en múltiples capas: (1) <strong>Autenticación:</strong> Sistema de usuarios con contraseñas hasheadas (SHA256), no almacenadas en texto plano, (2) <strong>Autorización por roles:</strong> Separación clara entre Operarios (pueden modificar) y Visualizadores (solo consulta), con código de invitación para registro de operarios, (3) <strong>Sesiones seguras:</strong> Cookies HTTP-only, timeout de 20 minutos, validación en cada solicitud, (4) <strong>HTTPS extremo a extremo:</strong> NGROK proporciona túnel HTTPS seguro, cifrando toda la comunicación, (5) <strong>Validación en servidor y cliente:</strong> Permisos verificados tanto en controladores como en la interfaz, (6) <strong>Control de acceso:</strong> Solo usuarios autenticados pueden acceder al dashboard, redirección automática a login. La exposición vía NGROK es temporal y controlada, ideal para acceso remoto sin configuración compleja de firewall/NAT.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 5: ¿Qué pasaría si la API de Sitrad PRO o NUONUO deja de responder? ¿Cómo maneja el sistema los fallos?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> Se implementaron varias estrategias de tolerancia a fallos: (1) <strong>Reintentos exponenciales:</strong> Las llamadas a APIs tienen mecanismos de reintento con backoff exponencial para manejar fallos temporales, (2) <strong>Marcadores de integridad:</strong> El sistema diferencia entre lectura válida, fuera de rango o faltante, permitiendo al usuario entender el estado de los datos, (3) <strong>Manejo graceful de errores:</strong> Si una API no responde, el dashboard sigue mostrando las variables disponibles de otras fuentes, (4) <strong>Buffer local planificado:</strong> Se diseñó (aunque no está completamente implementado) un buffer local para almacenar lecturas cuando la conexión se cae y reenviarlas al restablecerse, (5) <strong>Feedback visual:</strong> El dashboard muestra claramente cuando hay problemas de conectividad mediante toasts y estados visuales. Esta es un área de mejora continua, especialmente el buffer local completo.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 6: ¿Cómo escalaría este sistema si Almar SRL quisiera agregar más cámaras o sensores?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> La arquitectura fue diseñada pensando en escalabilidad: (1) <strong>Backend como punto único de integración:</strong> Para agregar cámaras, solo se ajustan los clientes de API o el modelo de datos, el contrato HTTP/JSON con el dashboard se mantiene, (2) <strong>Arquitectura modular:</strong> Los servicios (SitradApiClient, NuonuoApiClient) están desacoplados, facilitando agregar nuevos proveedores o sensores, (3) <strong>Base de datos:</strong> SQLite puede manejar el volumen esperado, y Entity Framework facilita migración a bases más robustas si fuera necesario, (4) <strong>Modelo de datos flexible:</strong> El CameraViewModel puede extenderse con nuevas variables sin afectar la lógica existente, (5) <strong>Separación de capas:</strong> Cada capa puede evolucionar independientemente. Por ejemplo, se pueden agregar sensores en la capa física sin modificar el dashboard, siempre que se mantenga el contrato del backend.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 7: ¿Por qué usaste SHA256 para las contraseñas y no algoritmos más modernos como bcrypt o Argon2?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> SHA256 fue elegido como balance entre seguridad y simplicidad para este contexto: (1) <strong>Suficiente para el caso de uso:</strong> SHA256 proporciona seguridad adecuada para este tipo de aplicación empresarial interna, (2) <strong>Simplicidad de implementación:</strong> Más simple de implementar y mantener que bcrypt/Argon2, especialmente considerando el alcance del proyecto, (3) <strong>Estándar ampliamente usado:</strong> SHA256 es un estándar reconocido y aceptado, (4) <strong>Contexto de uso:</strong> Sistema interno con acceso controlado, no es un sistema público masivo, (5) <strong>Evolución futura:</strong> La arquitectura permite migrar a algoritmos más robustos si fuera necesario sin rehacer todo el sistema. Reconozco que para sistemas públicos de mayor escala, bcrypt o Argon2 serían preferibles por su resistencia a fuerza bruta, pero para este contexto SHA256 es apropiado.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 8: ¿Qué métricas o KPIs usaste para validar que el sistema cumple con los objetivos?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> La validación se realizó principalmente de forma cualitativa y funcional: (1) <strong>Validación funcional:</strong> Todas las variables requeridas se muestran correctamente en el dashboard, (2) <strong>Feedback del cliente:</strong> Demostraciones con jefes de maduración y operarios mostraron que el sistema facilita la detección rápida de desvíos comparado con HMI locales, (3) <strong>Latencia:</strong> Actualización cada 5 segundos es aceptable para el proceso de maduración (que no requiere milisegundos), (4) <strong>Usabilidad:</strong> Interfaz intuitiva validada mediante pruebas informales con usuarios reales, (5) <strong>Disponibilidad:</strong> Sistema operativo durante ventanas operativas. Métricas cuantitativas más formales (como tiempo promedio de detección de desvíos, reducción de tiempo de consulta) serían valiosas para una evaluación más completa, pero están fuera del alcance de este prototipo inicial.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 9: ¿Qué aprendiste del proceso de integración con proveedores externos (NUONUO)?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> La integración con NUONUO fue una experiencia muy valiosa que me enseñó varias lecciones: (1) <strong>Importancia de la coordinación:</strong> Trabajar con proveedores externos requiere comunicación clara y procedimientos estandarizados, especialmente cuando hay diferencias de huso horario, (2) <strong>Validación temprana:</strong> Es crítico validar sensor por sensor que el mapeo (alias/IMEI ↔ cámara) sea correcto desde el inicio, (3) <strong>Documentación y trazabilidad:</strong> Mantener esquemas explícitos de identificación evita errores costosos, (4) <strong>Flexibilidad técnica:</strong> Adaptarse a las limitaciones y procesos del proveedor (alta manual en cloud, comunicación vía WeChat) mientras se mantiene calidad técnica, (5) <strong>Habilidades blandas:</strong> Comunicación efectiva, paciencia y organización fueron tan importantes como las habilidades técnicas. Esta experiencia me preparó mejor para proyectos reales donde no todo es controlable internamente.</p>
+        </div>
+    </div>
+
+    <div class="question-box">
+        <h4>❓ Pregunta 10: ¿Qué harías diferente si tuvieras que empezar el proyecto de nuevo?</h4>
+        <div class="answer-box">
+            <p><strong>Respuesta sugerida:</strong> Si tuviera que empezar de nuevo, haría varios ajustes: (1) <strong>Prototipo más temprano con el cliente:</strong> Involucrar usuarios finales desde el inicio para validar diseño y funcionalidades, (2) <strong>Documentar APIs desde el inicio:</strong> Crear documentación clara de las APIs externas y sus contratos, facilitando mantenimiento futuro, (3) <strong>Testing más estructurado:</strong> Implementar pruebas automatizadas, especialmente para integraciones con APIs externas, (4) <strong>Métricas desde el inicio:</strong> Definir KPIs cuantitativos para medir impacto real del sistema, (5) <strong>Buffer local desde el inicio:</strong> Priorizar el buffer local para cortes de red como funcionalidad core, no como trabajo futuro, (6) <strong>Documentación técnica más detallada:</strong> Más diagramas de flujo, documentación de decisiones arquitectónicas, (7) <strong>Iteraciones más pequeñas:</strong> Sprints más cortos con feedback más frecuente. Sin embargo, estoy satisfecho con la arquitectura general y las decisiones técnicas principales, que fueron sólidas.</p>
+        </div>
+    </div>
+
+    <h1 id="conclusiones">7. Conclusiones y Trabajo Futuro</h1>
+    
+    <div class="key-points">
+        <h3>Conclusiones Principales</h3>
+        <p>El proyecto de monitoreo IoT de cámaras de maduración en Almar SRL demuestra que es factible integrar datos heterogéneos de múltiples fuentes en una plataforma unificada, proporcionando valor operativo inmediato a través de visualización centralizada y accesible.</p>
+    </div>
+
+    <h3>7.1 Logros del Proyecto</h3>
+    <ul>
+        <li><strong>Integración exitosa:</strong> Se logró integrar datos de Sitrad PRO y NUONUO en un modelo unificado</li>
+        <li><strong>Arquitectura sólida:</strong> Diseño de tres capas que facilita mantenimiento y evolución</li>
+        <li><strong>Valor demostrado:</strong> Prototipo funcional que ya aporta valor a la operación diaria</li>
+        <li><strong>Aprendizaje integral:</strong> Experiencia técnica y de gestión de proyecto con cliente real</li>
+    </ul>
+
+    <h3>7.2 Limitaciones y Trabajo Futuro</h3>
+    <p><strong>Limitaciones actuales:</strong></p>
+    <ul>
+        <li>Buffer local para cortes de red aún en fase de diseño</li>
+        <li>Historial completo y agregaciones parcialmente implementadas</li>
+        <li>Sistema de alertas externas no implementado</li>
+        <li>Reportes exportables pendientes</li>
+    </ul>
+    
+    <p><strong>Evolución futura:</strong></p>
+    <ul>
+        <li>Completar funcionalidades planificadas (buffer, historial, alertas, reportes)</li>
+        <li>Integración con sistemas corporativos (ERP, Microsoft ecosystem)</li>
+        <li>Analítica predictiva para optimización del proceso</li>
+        <li>Ajustes automáticos de setpoints basados en reglas de negocio</li>
+        <li>Escalado a más cámaras o nuevas variables</li>
+    </ul>
+
+    <h3>7.3 Reflexión Personal</h3>
+    <div class="highlight-box">
+        <p>Este proyecto en Almar SRL significó mi primer acercamiento "de punta a punta" a una necesidad operativa real, donde cada decisión técnica tenía impacto directo en la toma de decisiones diaria. Me permitió aprender no solo sobre IoT e integración de sensores, sino también sobre comunicación con usuarios no técnicos, trabajo con personas, iteración rápida a partir del feedback, y priorización de disponibilidad y accesibilidad por encima de "lo ideal" en un laboratorio.</p>
+        
+        <p>Trabajar con cámaras de maduración me hizo valorar la importancia de la precisión, ya que estos datos influyen en decisiones operativas críticas (por ejemplo, definir si un lote está en condiciones de venta), y la necesidad de transformar datos dispersos en información accionable.</p>
+        
+        <p>En resumen, fue una experiencia que consolidó mis habilidades técnicas y, al mismo tiempo, reforzó mi motivación por construir soluciones que generen valor concreto en procesos productivos.</p>
+        </div>
+
+    <div class="page-break"></div>
+    
+    <h1>8. Anexos Técnicos</h1>
+    
+    <h3>8.1 Variables Monitoreadas por Cámara</h3>
+    <table>
+        <tr>
+            <th>Variable</th>
+            <th>Fuente</th>
+            <th>Rango Típico</th>
+            <th>Importancia</th>
+        </tr>
+        <tr>
+            <td>Temperatura de Aire</td>
+            <td>Sitrad PRO</td>
+            <td>-40°C a +80°C</td>
+            <td>Alta - Control ambiental</td>
+        </tr>
+        <tr>
+            <td>Temperatura de Pulpa</td>
+            <td>Sitrad PRO</td>
+            <td>15°C a 25°C</td>
+            <td>Crítica - Estado interno fruta</td>
+        </tr>
+        <tr>
+            <td>Humedad Relativa</td>
+            <td>Sitrad PRO</td>
+            <td>0% a 100% HR</td>
+            <td>Alta - Control ambiental</td>
+        </tr>
+        <tr>
+            <td>Estado Evaporador</td>
+            <td>Sitrad PRO</td>
+            <td>On/Off</td>
+            <td>Media - Equipo climatización</td>
+        </tr>
+        <tr>
+            <td>CO₂</td>
+            <td>NUONUO</td>
+            <td>0-5000 ppm</td>
+            <td>Alta - Gases maduración</td>
+        </tr>
+        <tr>
+            <td>Etileno</td>
+            <td>NUONUO</td>
+            <td>0-100 ppm</td>
+            <td>Alta - Gases maduración</td>
+        </tr>
+        <tr>
+            <td>SET1, SET3</td>
+            <td>Sitrad PRO</td>
+            <td>Configurable</td>
+            <td>Alta - Setpoints control</td>
+        </tr>
+    </table>
+
+    <h3>8.2 Stack Tecnológico Completo</h3>
+    <table>
+        <tr>
+            <th>Categoría</th>
+            <th>Tecnología</th>
+            <th>Versión</th>
+        </tr>
+        <tr>
+            <td>Backend Framework</td>
+            <td>ASP.NET Core MVC</td>
+            <td>9.0</td>
+        </tr>
+        <tr>
+            <td>ORM</td>
+            <td>Entity Framework Core</td>
+            <td>9.0</td>
+        </tr>
+        <tr>
+            <td>Base de Datos</td>
+            <td>SQLite</td>
+            <td>Latest</td>
+        </tr>
+        <tr>
+            <td>Frontend CSS</td>
+            <td>Tailwind CSS</td>
+            <td>Latest</td>
+        </tr>
+        <tr>
+            <td>JavaScript Library</td>
+            <td>jQuery</td>
+            <td>3.6.0</td>
+        </tr>
+        <tr>
+            <td>Serialización JSON</td>
+            <td>Newtonsoft.Json</td>
+            <td>13.0.3</td>
+        </tr>
+        <tr>
+            <td>Control de Versiones</td>
+            <td>Git / GitHub</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Gestión de Proyecto</td>
+            <td>Jira</td>
+            <td>-</td>
+        </tr>
+    </table>
+
+    <h3>8.3 Estructura del Proyecto</h3>
+    <pre><code>CloudPepeNew/
+├── Controllers/
+│   ├── AccountController.cs      # Autenticación
+│   ├── SitradController.cs       # Dashboard principal
+│   └── HomeController.cs
+├── Services/
+│   └── AuthService.cs            # Gestión usuarios
+├── Models/
+│   ├── User.cs                   # Modelo usuario
+│   ├── CameraViewModel.cs        # Vista consolidada cámara
+│   └── ErrorViewModel.cs
+├── Data/
+│   └── AppDbContext.cs           # Entity Framework context
+├── Views/
+│   ├── Account/                  # Login, Register
+│   ├── Sitrad/                   # Dashboard principal
+│   └── Shared/                   # Layouts
+├── wwwroot/
+│   ├── css/                      # Tailwind CSS
+│   ├── js/                       # jQuery scripts
+│   └── lib/                      # Librerías externas
+├── Program.cs                    # Punto de entrada
+├── appsettings.json              # Configuración (NO en Git)
+└── sitrad.db                     # SQLite database</code></pre>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #7f8c8d; font-size: 10pt;">
+        <p><strong>Documento de Defensa - Monitoreo IoT Cámaras de Maduración</strong></p>
+        <p>Gonzalo Belvisi - Director: Pablo Navas Torena</p>
+        <p>Facultad de Ingeniería - Diciembre 2024</p>
+    </div>
+</body>
+</html>

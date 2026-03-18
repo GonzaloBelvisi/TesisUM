@@ -1,0 +1,799 @@
+@model List<SitradWebInterface.Models.CameraViewModel>
+
+@{
+    ViewData["Title"] = "Cámaras - ZAC";
+    Layout = "_Layout";
+    
+    var isOperario = ViewData["IsOperario"] as bool? ?? false;
+
+    Func<string, string> GetCamNumber = camName =>
+    {
+        var beforeDash = camName.Contains('-')
+            ? camName.Split('-', 2)[0]
+            : camName;
+        var parts = beforeDash
+            .Trim()
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Last();
+    };
+
+    var rackGroups = new[]
+    {
+        new { Name = "Rack 0", Numbers = new[] { "1", "2", "3" } },
+        new { Name = "Rack 1", Numbers = new[] { "4", "5", "6", "7", "8" } },
+        new { Name = "Rack 2", Numbers = new[] { "9", "10", "11", "12", "13" } },
+        new { Name = "Rack 3", Numbers = new[] { "14", "15", "16", "17", "18" } },
+        new { Name = "Rack 4", Numbers = new[] { "19", "20", "21", "22", "23" } },
+        new { Name = "Rack 5", Numbers = new[] { "24", "25", "26", "27", "28", "29", "30" } },
+    };
+}
+
+@using System.Globalization
+
+<div id="toast-container" class="fixed top-4 right-4 z-[1002] space-y-2 pointer-events-none"></div>
+
+@if (!isOperario)
+{
+    <div class="container mx-auto px-4 mt-4 mb-4">
+        <div class="bg-amber-100 dark:bg-amber-900 border border-amber-400 dark:border-amber-700 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-lg flex items-center gap-2">
+            <span class="iconify text-xl" data-icon="lucide:info" data-inline="false"></span>
+            <span class="text-sm font-medium">Modo Visualizador: Solo puede ver los datos. Los operarios pueden modificar valores.</span>
+        </div>
+    </div>
+}
+
+<div class="container mx-auto px-4 mt-6 mb-6 space-y-8">
+    <!-- Tarjetas de resumen -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 shadow-md">
+            <span class="iconify text-2xl text-emerald-400" data-icon="lucide:monitor-smartphone" data-inline="false"></span>
+            <div>
+                <div class="text-sm text-slate-400">Cámaras activas</div>
+                <div id="summary-active" class="text-2xl font-semibold text-white">--</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 shadow-md">
+            <span class="iconify text-2xl text-sky-400" data-icon="lucide:thermometer-snowflake" data-inline="false"></span>
+            <div>
+                <div class="text-sm text-slate-400">Temp. promedio</div>
+                <div id="summary-temp" class="text-2xl font-semibold text-white">--</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 shadow-md">
+            <span class="iconify text-2xl text-indigo-400" data-icon="lucide:water" data-inline="false"></span>
+            <div>
+                <div class="text-sm text-slate-400">Humedad promedio</div>
+                <div id="summary-hum" class="text-2xl font-semibold text-white">--</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 shadow-md">
+            <span class="iconify text-2xl text-amber-400" data-icon="lucide:alert-triangle" data-inline="false"></span>
+            <div>
+                <div class="text-sm text-slate-400">Alertas pulpa &gt; 18°C</div>
+                <div id="summary-alerts" class="text-2xl font-semibold text-white">--</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vista escritorio -->
+<div class="hidden md:block space-y-8">
+    @foreach (var rack in rackGroups)
+    {
+        <div class="flex justify-center">
+            <!-- ⚡️ Acá el rack se ajusta al ancho real de la tabla, NO a w-full ⚡️ -->
+            <div class="shadow-md border border-slate-700 bg-slate-800 rounded-2xl overflow-visible">
+                <div class="flex items-center px-6 py-4 bg-slate-900 rounded-t-2xl overflow-hidden">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    <h4 class="text-xl font-semibold text-white">@rack.Name</h4>
+                </div>
+                <!-- Tabla (el ancho lo define la cantidad de columnas) -->
+                <div class="pb-6">
+                    <table class="border-collapse" style="min-width: 1200px; width: auto;">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">Cámara</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">Temperatura</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">SET1</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">SET3</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">Pulpa</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium">Evaporador</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium whitespace-nowrap">CO₂</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium whitespace-nowrap">Etileno</th>
+                                <th class="px-6 py-3 bg-slate-700 text-slate-300 text-sm font-medium whitespace-nowrap">Humedad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cam in Model.Where(m => rack.Numbers.Contains(GetCamNumber(m.CameraName)))
+                                                      .OrderBy(m => int.Parse(GetCamNumber(m.CameraName))))
+                            {
+                                var pulpText = cam.PulpTemp?.TrimEnd('°', 'C').Replace(",", ".");
+                                double.TryParse(pulpText, NumberStyles.Any, CultureInfo.InvariantCulture, out var pulpVal);
+                                var pulpClass = pulpVal > 19 ? "bg-red-500"
+                                              : pulpVal >= 18 ? "bg-orange-500"
+                                              : pulpVal >= 17 ? "bg-yellow-500"
+                                              : "bg-green-500";
+                            <tr data-instrument-id="@cam.InstrumentId" class="odd:bg-slate-800 even:bg-slate-900">
+                                <td class="px-6 py-4 text-sm font-medium text-slate-100 whitespace-nowrap">
+                                    @cam.CameraName
+                                </td>
+                                <td class="px-6 py-4 text-sm text-slate-200 flex items-center gap-1 whitespace-nowrap">
+                                    <span class="iconify text-slate-400" data-icon="lucide:thermometer" data-inline="false"></span>
+                                    <span class="temperature-cell">@cam.Temperature</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-2">
+                                        <input
+                                            type="text"
+                                            inputmode="decimal"
+                                            id="set1_@cam.InstrumentId"
+                                            value="@cam.Set1"
+                                            placeholder="Enter para aplicar"
+                                            @(isOperario ? "" : "disabled readonly")
+                                            class="w-28 h-8 bg-slate-700 border border-slate-700 rounded-lg text-right text-slate-100 pr-3 focus:outline-none @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                        />
+                                        <button
+                                            class="w-8 h-8 flex items-center justify-center bg-slate-700 border border-slate-700 rounded hover:bg-slate-600 transition @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                            onclick="@(isOperario ? $"confirmSetpoint({cam.InstrumentId},'SET1')" : "showToast('warning', 'Solo los operarios pueden modificar valores')")"
+                                            id="set1_btn_@cam.InstrumentId"
+                                            @(isOperario ? "" : "disabled")
+                                        >
+                                            <span class="iconify text-green-500" data-icon="lucide:check" data-inline="false" id="set1_icon_@cam.InstrumentId"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-2">
+                                        <input
+                                            type="text"
+                                            inputmode="decimal"
+                                            id="set3_@cam.InstrumentId"   
+                                            value="@cam.Set3"
+                                            placeholder="Enter para aplicar"
+                                            @(isOperario ? "" : "disabled readonly")
+                                            class="w-28 h-8 bg-slate-700 border border-slate-700 rounded-lg text-right text-slate-100 pr-3 focus:outline-none @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                        />
+                                        <button
+                                            class="w-8 h-8 flex items-center justify-center bg-slate-700 border border-slate-700 rounded hover:bg-slate-600 transition @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                            onclick="@(isOperario ? $"confirmSetpoint({cam.InstrumentId},'SET3')" : "showToast('warning', 'Solo los operarios pueden modificar valores')")"
+                                            id="set3_btn_@cam.InstrumentId"
+                                            @(isOperario ? "" : "disabled")
+                                        >
+                                            <span class="iconify text-green-500" data-icon="lucide:check" data-inline="false" id="set3_icon_@cam.InstrumentId"></span>
+                                        </button>
+                                    </div>
+                                </td>
+
+                                @{
+                                    // Lógica de color para el número
+                                    var pulpText1 = cam.PulpTemp?.TrimEnd('°', 'C').Replace(",", ".");
+                                    double.TryParse(pulpText, NumberStyles.Any, CultureInfo.InvariantCulture, out var pulpVal1);
+
+                                    var pulpClass1 = pulpVal > 19 ? "bg-red-500"
+                                                   : pulpVal >= 18 ? "bg-orange-500"
+                                                   : pulpVal >= 17 ? "bg-yellow-500"
+                                                   : "bg-green-500";
+
+                                    var pulpTextClass = pulpVal > 19 ? "text-red-500"
+                                                       : pulpVal >= 18 ? "text-orange-400"
+                                                       : pulpVal >= 17 ? "text-yellow-300"
+                                                       : "text-green-400";
+                                }
+                                <td class="px-6 py-4 text-sm text-slate-100 flex items-center whitespace-nowrap">
+                                    <span class="status-dot w-2 h-2 rounded-full mr-2 @pulpClass"></span>
+                                    <span class="pulp-value @pulpTextClass">@cam.PulpTemp</span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-slate-100 whitespace-nowrap">@cam.EvaporatorTemp</td>
+                                <td class="px-6 py-4 text-sm text-slate-100 co2-cell whitespace-nowrap">@cam.co2</td>
+                                <td class="px-6 py-4 text-sm text-slate-100 etileno-cell whitespace-nowrap">@cam.etileno</td>
+                                <td class="px-6 py-4 text-sm text-slate-100 humidity-cell whitespace-nowrap">@cam.Humidity</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Vista móvil moderna con SET1 y SET3 compactos -->
+<div class="block md:hidden space-y-8">
+    @foreach (var rack in rackGroups)
+    {
+        <div>
+            <div class="mb-3 flex items-center gap-2 px-1">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span class="text-lg font-semibold text-slate-200">@rack.Name</span>
+            </div>
+            <div class="space-y-6">
+                @foreach (var cam in Model.Where(m => rack.Numbers.Contains(GetCamNumber(m.CameraName)))
+                          .OrderBy(m => int.Parse(GetCamNumber(m.CameraName))))
+                {
+                    var pulpText = cam.PulpTemp?.TrimEnd('°', 'C').Replace(",", ".");
+                    double.TryParse(pulpText, NumberStyles.Any, CultureInfo.InvariantCulture, out var pulpVal);
+
+                    var pulpTextClass = pulpVal > 19 ? "text-red-500"
+                                     : pulpVal >= 18 ? "text-orange-400"
+                                     : pulpVal >= 17 ? "text-yellow-300"
+                                     : "text-green-400";
+                    var pulpCircle = pulpVal > 19 ? "bg-red-500"
+                                   : pulpVal >= 18 ? "bg-orange-500"
+                                   : pulpVal >= 17 ? "bg-yellow-500"
+                                   : "bg-green-500";
+                <div class="bg-slate-800 rounded-2xl shadow-md border border-slate-700 p-3 space-y-3" data-instrument-id="@cam.InstrumentId">
+                    <!-- Header cámara -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="iconify text-xl text-blue-400" data-icon="lucide:video" data-inline="false"></span>
+                        <span class="text-base font-semibold text-white">@cam.CameraName</span>
+                    </div>
+                    <!-- Temperatura y Pulpa lado a lado en grande -->
+                    <div class="grid grid-cols-2 gap-2 mb-1">
+                        <div class="rounded-xl bg-slate-700 flex flex-col items-center py-2">
+                            <div class="text-xs text-slate-400 mb-1">Temperatura</div>
+                            <div class="flex items-center gap-1 text-xl font-bold text-slate-100">
+                                <span class="iconify text-slate-400" data-icon="lucide:thermometer"></span>
+                                <span class="temperature-cell">@cam.Temperature</span>
+                            </div>
+                        </div>
+                        <div class="rounded-xl bg-slate-700 flex flex-col items-center py-2">
+                            <div class="text-xs text-slate-400 mb-1">Pulpa</div>
+                            <div class="flex items-center gap-1 text-xl font-bold @pulpTextClass">
+                                <span class="status-dot w-2 h-2 rounded-full mr-1 @pulpCircle"></span>
+                                <span class="pulp-value">@cam.PulpTemp</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- SET1 -->
+                    <div class="flex items-center justify-between w-full px-1 py-1">
+                        <span class="text-base font-semibold text-slate-300 mr-2">SET1 (Frío)</span>
+                        <div class="flex items-center gap-2">
+                            <input
+                                type="text"
+                                inputmode="decimal"
+                                id="m_set1_@cam.InstrumentId"
+                                value="@cam.Set1"
+                                placeholder="Enter"
+                                @(isOperario ? "" : "disabled readonly")
+                                class="w-20 h-8 bg-slate-700 border border-slate-600 rounded-lg text-right text-slate-100 text-lg px-2 focus:outline-none @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                            />
+                            <button class="w-8 h-8 flex items-center justify-center bg-slate-700 border border-slate-700 rounded-r-lg rounded-l-none hover:bg-slate-600 transition @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                    onclick="@(isOperario ? $"confirmSetpoint({cam.InstrumentId},'SET1', true)" : "showToast('warning', 'Solo los operarios pueden modificar valores')")"
+                                    id="m_set1_btn_@cam.InstrumentId"
+                                    @(isOperario ? "" : "disabled")>
+                                <span class="iconify text-green-500 text-xl" data-icon="lucide:check" data-inline="false" id="m_set1_icon_@cam.InstrumentId"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border-b border-white border-opacity-10 mx-1"></div>
+
+                    <!-- SET3 -->
+                    <div class="flex items-center justify-between w-full px-1 py-1">
+                        <span class="text-base font-semibold text-slate-300 mr-2">SET3 (Calor)</span>
+                        <div class="flex items-center gap-2">
+                            <input
+                                type="text"
+                                inputmode="decimal"
+                                id="m_set3_@cam.InstrumentId"
+                                value="@cam.Set3"
+                                placeholder="Enter"
+                                @(isOperario ? "" : "disabled readonly")
+                                class="w-20 h-8 bg-slate-700 border border-slate-600 rounded-lg text-right text-slate-100 text-lg px-2 focus:outline-none @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                            />
+                            <button class="w-8 h-8 flex items-center justify-center bg-slate-700 border border-slate-700 rounded-r-lg rounded-l-none hover:bg-slate-600 transition @(isOperario ? "" : "opacity-50 cursor-not-allowed")"
+                                    onclick="@(isOperario ? $"confirmSetpoint({cam.InstrumentId},'SET3', true)" : "showToast('warning', 'Solo los operarios pueden modificar valores')")"
+                                    id="m_set3_btn_@cam.InstrumentId"
+                                    @(isOperario ? "" : "disabled")>
+                                <span class="iconify text-green-500 text-xl" data-icon="lucide:check" data-inline="false" id="m_set3_icon_@cam.InstrumentId"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border-b border-white border-opacity-10 mx-1"></div>
+
+                    <!-- Bloque 2x2 de variables -->
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div class="bg-slate-700 rounded-lg flex flex-col items-center py-1">
+                            <div class="text-xs text-slate-400">Evaporador</div>
+                            <div class="evaporator-cell text-sm font-bold text-slate-100">@cam.EvaporatorTemp</div>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg flex flex-col items-center py-1">
+                            <div class="text-xs text-slate-400">CO₂</div>
+                            <div class="co2-cell text-sm font-bold text-slate-100">@cam.co2</div>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg flex flex-col items-center py-1">
+                            <div class="text-xs text-slate-400">Etileno</div>
+                            <div class="etileno-cell text-sm font-bold text-slate-100">@cam.etileno</div>
+                        </div>
+                        <div class="bg-slate-700 rounded-lg flex flex-col items-center py-1">
+                            <div class="text-xs text-slate-400">Humedad</div>
+                            <div class="humidity-cell text-sm font-bold text-slate-100">@cam.Humidity</div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  // Datos iniciales desde el servidor para poblar resumen al cargar
+  const initialData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+  var autoRefreshEnabled = true;
+  var editingSetpoints = new Set(); // Track which setpoints are being edited
+  var lastEditTime = 0;
+  var editTimeout = null;
+  var demoSetpoints = {}; // Cache de valores ficticios para SET1/SET3
+  var lastSnapshot = initialData || [];
+  
+  $(document)
+    .on("focus", "input", function() {
+      autoRefreshEnabled = false;
+      var inputId = $(this).attr('id');
+      if (inputId && (inputId.includes('set1_') || inputId.includes('set3_') || inputId.includes('m_set1_') || inputId.includes('m_set3_'))) {
+        editingSetpoints.add(inputId);
+        console.log('Pausando actualizaciones - editando setpoint:', inputId);
+        // Mostrar indicador inmediatamente
+        updateStatusIndicator();
+      }
+    })
+    .on("blur", "input", function() {
+      var inputId = $(this).attr('id');
+      if (inputId && editingSetpoints.has(inputId)) {
+        editingSetpoints.delete(inputId);
+        console.log('Reanudando actualizaciones - terminó edición:', inputId);
+        
+        // Ocultar indicador si no hay más setpoints siendo editados
+        if (editingSetpoints.size === 0) {
+          updateStatusIndicator(); // Esto ocultará el indicador
+          lastEditTime = Date.now();
+          // Esperar 2 segundos después de la última edición antes de reanudar
+          if (editTimeout) clearTimeout(editTimeout);
+          editTimeout = setTimeout(() => {
+            autoRefreshEnabled = true;
+            console.log('Actualizaciones reanudadas');
+          }, 2000);
+        }
+      }
+    })
+    .on("input", "input", function() {
+      var inputId = $(this).attr('id');
+      if (inputId && (inputId.includes('set1_') || inputId.includes('set3_') || inputId.includes('m_set1_') || inputId.includes('m_set3_'))) {
+        lastEditTime = Date.now();
+        // Extender el timeout si el usuario sigue escribiendo
+        if (editTimeout) clearTimeout(editTimeout);
+        editTimeout = setTimeout(() => {
+          if (editingSetpoints.size === 0) {
+            autoRefreshEnabled = true;
+            console.log('Actualizaciones reanudadas después de pausa por edición');
+            // Ocultar indicador cuando se reanuden las actualizaciones
+            updateStatusIndicator();
+          }
+        }, 3000); // 3 segundos de inactividad antes de reanudar
+      }
+    })
+    .on("keypress", "input", function(e) {
+      var inputId = $(this).attr('id');
+      if (e.which === 13 && inputId && (inputId.includes('set1_') || inputId.includes('set3_') || inputId.includes('m_set1_') || inputId.includes('m_set3_'))) {
+        e.preventDefault();
+        // Extraer ID del instrumento y código del input
+        var instrumentId = inputId.split('_').pop();
+        var code = inputId.includes('set1') ? 'SET1' : 'SET3';
+        var mobile = inputId.includes('m_');
+        
+        // Llamar a la función de confirmación
+        confirmSetpoint(instrumentId, code, mobile);
+      }
+    });
+
+  const toastColors = {
+    success: 'bg-emerald-600',
+    info: 'bg-sky-600',
+    warning: 'bg-amber-600',
+    error: 'bg-rose-600'
+  };
+
+  const toastIcons = {
+    success: 'lucide:check-circle',
+    info: 'lucide:info',
+    warning: 'lucide:alert-triangle',
+    error: 'lucide:alert-octagon'
+  };
+
+  // Variable para rastrear toasts activos y evitar duplicados
+  var activeToasts = new Set();
+  
+  function showToast(type, message) {
+    const container = document.getElementById('toast-container');
+    if (!container) return alert(message);
+
+    // Crear una clave única para este toast
+    const toastKey = `${type}-${message}`;
+    
+    // Si ya existe un toast idéntico, no crear otro
+    if (activeToasts.has(toastKey)) {
+      return;
+    }
+    
+    activeToasts.add(toastKey);
+
+    const toast = document.createElement('div');
+    toast.className = `pointer-events-auto flex items-start gap-3 text-white px-4 py-3 rounded-xl shadow-2xl border border-white/10 transition transform duration-200 ${toastColors[type] || toastColors.info}`;
+    toast.style.zIndex = '1001'; // Mayor que el indicador de edición
+    toast.innerHTML = `
+      <span class="iconify text-xl" data-icon="${toastIcons[type] || toastIcons.info}" data-inline="false"></span>
+      <div class="text-sm leading-tight">${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-2');
+    }, 2500); // Reducido a 2.5 segundos
+
+    setTimeout(() => {
+      toast.remove();
+      activeToasts.delete(toastKey);
+    }, 3000); // Total 3 segundos
+  }
+
+  function extractNumber(str) {
+    if (!str) return null;
+    const cleaned = str.toString().replace(/[^\d,.\-]/g, '').replace(',', '.');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? null : n;
+  }
+
+  function formatNumber(num, suffix = '') {
+    if (num === null || num === undefined || isNaN(num)) return '--';
+    return `${num.toFixed(1)}${suffix}`;
+  }
+
+  function updateSummary(list) {
+    if (!Array.isArray(list)) return;
+    
+    const temps = [];
+    const hums = [];
+    let alerts = 0;
+    let active = 0;
+
+    list.forEach(item => {
+      const t = extractNumber(item.temperature);
+      if (t !== null) {
+        temps.push(t);
+        active += 1; // Solo contar cámaras con temperatura válida (no N/A)
+      }
+
+      const h = extractNumber(item.humidity);
+      if (h !== null) hums.push(h);
+
+      const pulp = extractNumber(item.pulpTemp);
+      if (pulp !== null && pulp > 18) alerts += 1;
+    });
+
+    const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+
+    $('#summary-active').text(active || '--');
+    $('#summary-temp').text(formatNumber(avg(temps), '°C'));
+    $('#summary-hum').text(formatNumber(avg(hums), '%'));
+    $('#summary-alerts').text(alerts || 0);
+  }
+
+  function confirmSetpoint(id, code, mobile = false) {
+    var sel = mobile
+      ? `#m_${code.toLowerCase()}_${id}`
+      : `#${code.toLowerCase()}_${id}`;
+    var raw = $(sel).val().replace("°C","").trim();
+    if (!/^\d+([,]\d+)?$/.test(raw)) return showToast('warning', "Formato inválido. Usa números con coma.");
+    updateSetpoint(id, code, raw, mobile);
+  }
+
+  function updateSetpoint(id, code, val, mobile = false) {
+    // Pausar actualizaciones durante el envío
+    autoRefreshEnabled = false;
+    var inputId = mobile ? `m_${code.toLowerCase()}_${id}` : `${code.toLowerCase()}_${id}`;
+    editingSetpoints.add(inputId);
+    
+    // Mostrar indicador de carga
+    setSetpointStatus(id, code, 'loading', mobile);
+    
+    $.post('/Sitrad/UpdateFunctionValue', { instrumentId: id, code, newValue: val })
+      .done(r => { 
+        if (r.success) {
+          var formatted = (r.appliedValue ?? val).toString().replace(".", ",") + "°C";
+          // Actualizar los inputs para mostrar el nuevo valor de forma local
+          $(`#${code.toLowerCase()}_${id}`).val(formatted);
+          $(`#m_${code.toLowerCase()}_${id}`).val(formatted);
+          // Guardar en cache de demo para que el auto-refresh no lo sobrescriba
+          if (!demoSetpoints[id]) demoSetpoints[id] = {};
+          demoSetpoints[id][code.toUpperCase()] = formatted;
+
+          setSetpointStatus(id, code, 'success', mobile);
+          
+          // Ocultar el indicador de edición antes de mostrar el toast
+          editingSetpoints.delete(inputId);
+          updateStatusIndicator();
+          
+          // Pequeño delay para que el indicador se oculte antes del toast
+          setTimeout(() => {
+            showToast('success', r.message || "Valor actualizado");
+          }, 100);
+
+          // Actualizar snapshot local para resumen
+          lastSnapshot = lastSnapshot.map(item => {
+            if (item.instrumentId == id) {
+              return {
+                ...item,
+                set1: code === 'SET1' ? formatted : item.set1,
+                set3: code === 'SET3' ? formatted : item.set3
+              };
+            }
+            return item;
+          });
+          updateSummary(lastSnapshot);
+        } else if (r.retrying) {
+          setSetpointStatus(id, code, 'retrying', mobile);
+          showToast('warning', r.message || "Cámara desactivada. Reintentando automáticamente...");
+        } else {
+          setSetpointStatus(id, code, 'error', mobile);
+          showToast('error', r.message || "Error: " + (r.error || "Error desconocido"));
+        }
+        
+        // Reanudar actualizaciones después de un breve delay (solo si no fue éxito, porque éxito ya lo maneja arriba)
+        if (!r.success) {
+          setTimeout(() => {
+            editingSetpoints.delete(inputId);
+            updateStatusIndicator();
+            if (editingSetpoints.size === 0) {
+              autoRefreshEnabled = true;
+              updateDashboard();
+            }
+          }, 1000);
+        } else {
+          // Si fue éxito, ya se manejó arriba, solo reanudar actualizaciones
+          setTimeout(() => {
+            if (editingSetpoints.size === 0) {
+              autoRefreshEnabled = true;
+              updateDashboard();
+            }
+          }, 500);
+        }
+        
+        // Si fue exitoso, limpiar cualquier estado de reintento
+        if (r.success) {
+          clearRetryStatus(id, code);
+        }
+      })
+      .fail(() => {
+        setSetpointStatus(id, code, 'error', mobile);
+        showToast('error', "Error de conexión");
+        
+        // Reanudar actualizaciones incluso en caso de error
+        setTimeout(() => {
+          editingSetpoints.delete(inputId);
+          if (editingSetpoints.size === 0) {
+            autoRefreshEnabled = true;
+          }
+        }, 1000);
+      });
+  }
+
+  function setSetpointStatus(id, code, status, mobile = false) {
+    var prefix = mobile ? 'm_' : '';
+    var iconId = `${prefix}${code.toLowerCase()}_icon_${id}`;
+    var btnId = `${prefix}${code.toLowerCase()}_btn_${id}`;
+    
+    var $icon = $(`#${iconId}`);
+    var $btn = $(`#${btnId}`);
+    
+    // Verificar si el botón ya está en estado normal y no necesita cambio
+    if (status === 'retrying' && $btn.hasClass('bg-slate-700') && $icon.hasClass('text-green-500')) {
+      // Si ya está en estado normal, no cambiar a retrying a menos que realmente esté en cola
+      return;
+    }
+    
+    // Remover clases anteriores
+    $btn.removeClass('bg-slate-700 bg-orange-500 bg-red-500 bg-green-500');
+    $icon.removeClass('text-green-500 text-orange-500 text-red-500 text-blue-500 text-white');
+    
+    switch(status) {
+      case 'loading':
+        $btn.addClass('bg-orange-500');
+        $icon.addClass('text-white');
+        $icon.attr('data-icon', 'lucide:loader-2');
+        break;
+      case 'retrying':
+        $btn.addClass('bg-orange-500');
+        $icon.addClass('text-white');
+        $icon.attr('data-icon', 'lucide:refresh-cw');
+        break;
+      case 'success':
+        $btn.addClass('bg-green-500');
+        $icon.addClass('text-white');
+        $icon.attr('data-icon', 'lucide:check');
+        // Volver al estado normal después de 2 segundos
+        setTimeout(() => {
+          resetSetpointButton(id, code, mobile);
+        }, 2000);
+        break;
+      case 'error':
+        $btn.addClass('bg-red-500');
+        $icon.addClass('text-white');
+        $icon.attr('data-icon', 'lucide:x');
+        // Volver al estado normal después de 3 segundos
+        setTimeout(() => {
+          resetSetpointButton(id, code, mobile);
+        }, 3000);
+        break;
+      default:
+        resetSetpointButton(id, code, mobile);
+    }
+  }
+
+  function resetSetpointButton(id, code, mobile = false) {
+    var prefix = mobile ? 'm_' : '';
+    var iconId = `${prefix}${code.toLowerCase()}_icon_${id}`;
+    var btnId = `${prefix}${code.toLowerCase()}_btn_${id}`;
+    
+    var $icon = $(`#${iconId}`);
+    var $btn = $(`#${btnId}`);
+    
+    // Volver al estado normal
+    $btn.removeClass('bg-slate-700 bg-orange-500 bg-red-500 bg-green-500').addClass('bg-slate-700');
+    $icon.removeClass('text-green-500 text-orange-500 text-red-500 text-blue-500 text-white').addClass('text-green-500');
+    $icon.attr('data-icon', 'lucide:check');
+  }
+
+  function updateDashboard() {
+    if (!autoRefreshEnabled) {
+      console.log('Actualización pausada - editando setpoints');
+      return;
+    }
+    
+    $.getJSON('/Sitrad/GetDashboardData', data => {
+      // Guardar snapshot para el resumen
+      lastSnapshot = data;
+      updateSummary(data);
+
+      data.forEach(cam => {
+        var id = cam.instrumentId;
+        var $row = $(`tr[data-instrument-id="${id}"]`);
+        if ($row.length) {
+          // Actualizar solo si no está siendo editado
+          $row.find('.temperature-cell').text(cam.temperature);
+          
+          // Solo actualizar setpoints si no están siendo editados
+          const cachedSet1 = demoSetpoints[id]?.SET1;
+          const cachedSet3 = demoSetpoints[id]?.SET3;
+
+          if (!editingSetpoints.has(`set1_${id}`)) {
+            $row.find(`#set1_${id}`).val(cachedSet1 || cam.set1);
+          }
+          if (!editingSetpoints.has(`set3_${id}`)) {
+            $row.find(`#set3_${id}`).val(cachedSet3 || cam.set3);
+          }
+          
+          $row.find('td.co2-cell').text(cam.co2);
+          $row.find('td.evaporator-cell').text(cam.evaporatorTemp);
+          $row.find('td.etileno-cell').text(cam.etileno);
+          $row.find('td.humidity-cell').text(cam.humidity);
+          $row.find('.pulp-value').text(cam.pulpTemp);
+        }
+        var $card = $(`div[data-instrument-id="${id}"]`);
+        if ($card.length) {
+          // Actualizar solo si no está siendo editado
+          $card.find('.temperature-cell').text(cam.temperature);
+          
+          // Solo actualizar setpoints si no están siendo editados
+          const cachedSet1m = demoSetpoints[id]?.SET1;
+          const cachedSet3m = demoSetpoints[id]?.SET3;
+
+          if (!editingSetpoints.has(`m_set1_${id}`)) {
+            $card.find(`#m_set1_${id}`).val(cachedSet1m || cam.set1);
+          }
+          if (!editingSetpoints.has(`m_set3_${id}`)) {
+            $card.find(`#m_set3_${id}`).val(cachedSet3m || cam.set3);
+          }
+          
+          $card.find('.evaporator-cell').text(cam.evaporatorTemp);
+          $card.find('.co2-cell').text(cam.co2);
+          $card.find('.etileno-cell').text(cam.etileno);
+          $card.find('.humidity-cell').text(cam.humidity);
+          $card.find('.pulp-value').text(cam.pulpTemp);
+        }
+      });
+    });
+  }
+
+  function checkRetryStatus() {
+    $.getJSON('/Sitrad/GetRetryStatus')
+      .done(data => {
+        // Cache de reintentos para comparar cambios
+        if (!window.retryStatusCache) {
+          window.retryStatusCache = [];
+        }
+        
+        // Solo aplicar estado de reintento a los que están siendo reintentados
+        data.retries.forEach(retry => {
+          var retryKey = `${retry.instrumentId}_${retry.code}`;
+          var wasInCache = window.retryStatusCache.some(cached => 
+            cached.instrumentId == retry.instrumentId && cached.code === retry.code
+          );
+          
+          // Solo aplicar estado si no estaba en cache (nuevo reintento)
+          if (!wasInCache) {
+            setSetpointStatus(retry.instrumentId, retry.code, 'retrying', false);
+            setSetpointStatus(retry.instrumentId, retry.code, 'retrying', true);
+          }
+        });
+        
+        // Actualizar cache
+        window.retryStatusCache = data.retries;
+      })
+      .fail(() => {
+        // Silenciar errores de reintentos
+      });
+  }
+
+  function updateStatusIndicator() {
+    var $indicator = $('#update-status');
+    if (!$indicator.length) {
+      // Crear indicador si no existe
+      $('body').append('<div id="update-status" style="position: fixed; top: 80px; right: 10px; z-index: 999; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; display: none;"></div>');
+      $indicator = $('#update-status');
+    }
+    
+    // Solo mostrar indicador cuando realmente se está editando
+    if (editingSetpoints.size > 0) {
+      $indicator.text('⏸️ Editando setpoints...').css({
+        'background-color': '#f59e0b',
+        'color': 'white',
+        'display': 'block'
+      });
+    } else {
+      // Ocultar el indicador cuando no se está editando
+      $indicator.fadeOut(200);
+    }
+  }
+
+  function resetAllSetpointButtons() {
+    // Resetear todos los botones de setpoints al estado normal
+    $('[id*="set1_btn_"], [id*="set3_btn_"], [id*="m_set1_btn_"], [id*="m_set3_btn_"]').each(function() {
+      var id = $(this).attr('id');
+      var instrumentId = id.split('_').pop();
+      var code = id.includes('set1') ? 'SET1' : 'SET3';
+      var mobile = id.includes('m_');
+      resetSetpointButton(instrumentId, code, mobile);
+    });
+  }
+
+  function clearRetryStatus(id, code) {
+    // Limpiar el estado de reintento para un setpoint específico
+    // Esto evita que checkRetryStatus lo marque como "retrying" nuevamente
+    var key = `${id}_${code}`;
+    if (window.retryStatusCache) {
+      window.retryStatusCache = window.retryStatusCache.filter(retry => 
+        !(retry.instrumentId == id && retry.code === code)
+      );
+    }
+  }
+
+  $(document).ready(function () {
+    // Inicializar resumen con datos iniciales del servidor
+    lastSnapshot = initialData || [];
+    updateSummary(lastSnapshot);
+
+    // Resetear todos los botones al cargar
+    resetAllSetpointButtons();
+    
+    updateDashboard();
+    setInterval(updateDashboard, 5000);
+    setInterval(checkRetryStatus, 3000); // Verificar estado de reintentos cada 3 segundos
+    // Remover el interval del indicador - ahora se maneja por eventos
+  });
+</script>
+
+

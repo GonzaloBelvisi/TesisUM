@@ -1,0 +1,196 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Registrarse";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Pepe</title>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 'slate-750': '#1e293b' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900">
+    <div class="min-h-screen flex items-start justify-center px-4" style="padding-top: 36px;">
+        <div id="registerCard" class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
+            @* Header *@
+            <div class="flex items-center gap-3 px-6 py-4 bg-blue-600">
+                <span class="iconify text-white text-2xl" data-icon="ic:outline-person-add" data-inline="false"></span>
+                <h2 class="text-xl font-semibold text-white m-0">@ViewData["Title"]</h2>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <form asp-action="Register" method="post" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Usuario
+                        </label>
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            placeholder="Ingrese un nombre de usuario"
+                            required
+                            autofocus
+                            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Contraseña
+                        </label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Mínimo 4 caracteres"
+                            required
+                            minlength="4"
+                            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Confirmar Contraseña
+                        </label>
+                        <input
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            type="password"
+                            placeholder="Repita la contraseña"
+                            required
+                            minlength="4"
+                            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Tipo de Usuario
+                        </label>
+                        <select
+                            id="role"
+                            name="role"
+                            required
+                            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="">Seleccione un rol</option>
+                            <option value="Operario">Operario (Puede modificar valores)</option>
+                            <option value="Visualizador">Visualizador (Solo lectura)</option>
+                        </select>
+                    </div>
+
+                    <div id="inviteCodeContainer" class="hidden">
+                        <label for="inviteCode" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Código de Invitación <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            id="inviteCode"
+                            name="inviteCode"
+                            type="text"
+                            placeholder="Ingrese el código de invitación"
+                            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Se requiere un código de invitación para registrarse como operario.
+                        </p>
+                    </div>
+
+                    <button
+                        id="registerBtn"
+                        type="submit"
+                        class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2">
+                        <span id="registerBtnText">Registrarse</span>
+                        <span id="registerSpinner" class="hidden">
+                            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4z"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="text-red-500 text-sm space-y-1 mt-2">
+                            @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@e.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+                </form>
+
+                <div class="text-center pt-2">
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        ¿Ya tienes cuenta?
+                        <a asp-action="Login" class="text-blue-600 dark:text-blue-400 hover:underline">Inicia sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector("form").addEventListener("submit", function () {
+            var btn = document.getElementById("registerBtn");
+            btn.disabled = true;
+            document.getElementById("registerBtnText").textContent = "Registrando…";
+            document.getElementById("registerSpinner").classList.remove("hidden");
+        });
+
+        const card = document.getElementById('registerCard');
+        const input = document.getElementById('username');
+        const origStyle = card.style.cssText;
+
+        function onFocus() {
+            if (window.innerWidth < 700) {
+                card.style.position = 'fixed';
+                card.style.top = '8%';
+                card.style.left = '50%';
+                card.style.transform = 'translateX(-50%)';
+                card.style.zIndex = 50;
+                card.style.width = '95vw';
+                card.style.maxWidth = '420px';
+            }
+        }
+
+        function onBlur() {
+            card.style.cssText = origStyle;
+        }
+
+        input.addEventListener('focus', onFocus);
+        input.addEventListener('blur', onBlur);
+
+        // Mostrar/ocultar campo de código de invitación según el rol seleccionado
+        const roleSelect = document.getElementById('role');
+        const inviteCodeContainer = document.getElementById('inviteCodeContainer');
+        const inviteCodeInput = document.getElementById('inviteCode');
+
+        roleSelect.addEventListener('change', function() {
+            if (this.value === 'Operario') {
+                inviteCodeContainer.classList.remove('hidden');
+                inviteCodeInput.setAttribute('required', 'required');
+            } else {
+                inviteCodeContainer.classList.add('hidden');
+                inviteCodeInput.removeAttribute('required');
+                inviteCodeInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
+

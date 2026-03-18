@@ -1,0 +1,110 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Acceso protegido";
+}
+
+<div class="min-h-screen flex items-start justify-center bg-slate-900 px-4" style="padding-top: 36px;">
+
+
+  <div id="loginCard" class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
+
+
+    @* —————— Header con candado —————— *@
+    <div class="flex items-center gap-3 px-6 py-4 bg-blue-600">
+      <span 
+        class="iconify text-white text-2xl" 
+        data-icon="ic:outline-lock" 
+        data-inline="false">
+      </span>
+      <h2 class="text-xl font-semibold text-white m-0">
+        @ViewData["Title"]
+      </h2>
+    </div>
+
+    <div class="p-6 space-y-4">
+      <form asp-action="Pin" method="post" class="space-y-4">
+        <div>
+          <label for="pinInput" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            Ingrese el PIN de 4 dígitos
+          </label>
+          <input
+            id="pinInput"
+            name="pin"
+            type="password"
+            maxlength="4"
+            pattern="\d{4}"
+            inputmode="numeric"
+            placeholder="1234"
+            required
+            autofocus
+            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+            class="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          />
+        </div>
+
+       <button
+  id="loginBtn"
+  type="submit"
+  class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+>
+  <span id="loginBtnText">Entrar</span>
+  <span id="loginSpinner" class="hidden">
+    <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4z"/>
+    </svg>
+  </span>
+</button>
+
+<script>
+document.querySelector("form").addEventListener("submit", function () {
+  var btn = document.getElementById("loginBtn");
+  btn.disabled = true;
+  document.getElementById("loginBtnText").textContent = "Entrando…";
+  document.getElementById("loginSpinner").classList.remove("hidden");
+});
+</script>
+
+<script>
+  const card = document.getElementById('loginCard');
+  const input = document.getElementById('pinInput');
+  const origStyle = card.style.cssText;
+
+  function onFocus() {
+    if (window.innerWidth < 700) { // solo móvil
+      card.style.position = 'fixed';
+      card.style.top = '8%';
+      card.style.left = '50%';
+      card.style.transform = 'translateX(-50%)';
+      card.style.zIndex = 50;
+      card.style.width = '95vw';
+      card.style.maxWidth = '420px';
+    }
+  }
+
+  function onBlur() {
+    card.style.cssText = origStyle;
+  }
+
+  input.addEventListener('focus', onFocus);
+  input.addEventListener('blur', onBlur);
+</script>
+
+
+
+
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+          <div class="text-red-500 text-sm space-y-1 mt-2">
+            @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+              <div>@e.ErrorMessage</div>
+            }
+          </div>
+        }
+      </form>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,80 @@
+@startuml Flujo de Datos - Extremo a Extremo
+
+skinparam backgroundColor #FAFAFA
+skinparam roundcorner 10
+
+title Flujo de Datos desde Sensor hasta Dashboard
+
+participant "Sensor\nFísico" as sensor
+participant "Controlador\nSitrad" as controlador
+participant "Sitrad PRO\nAPI" as sitrad_api
+participant "NUONUO\nAPI" as nuonuo_api
+participant "Backend\nASP.NET Core" as backend
+participant "SQLite\nDatabase" as db
+participant "Dashboard\nWeb" as dashboard
+participant "Usuario\nFinal" as usuario
+
+== Lectura de Variables de Sitrad ==
+
+sensor -> controlador: Señal analógica/digital\n(Temperatura, Humedad)
+controlador -> sitrad_api: POST/GET valores\nnormalizados
+sitrad_api -> backend: HTTP GET /instruments/{id}/values
+backend -> backend: SitradApiClient.GetValues()
+backend -> backend: Normalizar y mapear datos
+
+== Lectura de CO₂ y Etileno ==
+
+sensor -> nuonuo_api: Lectura directa vía API
+nuonuo_api -> backend: HTTP GET /sensors/{imei}/readings
+backend -> backend: NuonuoApiClient.GetSensorData()
+backend -> backend: Vincular sensor con cámara
+
+== Consolidación y Lógica de Negocio ==
+
+backend -> backend: Combinar datos Sitrad + NUONUO
+backend -> backend: Aplicar reglas de negocio\n(Semáforo pulpa, umbrales)
+backend -> backend: Crear CameraViewModel
+
+== Almacenamiento (Futuro) ==
+
+alt Historial habilitado (planificado)
+  backend -> db: INSERT Measurement\n(cámara, variable, valor, timestamp)
+end
+
+== Presentación ==
+
+backend -> dashboard: Renderizar vista Razor\ncon CameraViewModel
+dashboard -> usuario: HTML con datos actuales
+dashboard -> dashboard: jQuery actualiza cada 5 segundos
+dashboard -> backend: AJAX GET /Sitrad/GetDashboardData
+backend -> dashboard: JSON con datos actualizados
+dashboard -> usuario: Actualizar tarjetas sin recargar
+
+== Modificación de Setpoints (Solo Operarios) ==
+
+usuario -> dashboard: Click en modificar SET1/SET3
+dashboard -> backend: POST /Sitrad/UpdateFunctionValue\n(con validación de sesión)
+backend -> backend: Verificar rol (Operario)
+backend -> sitrad_api: POST /instruments/{id}/functions
+sitrad_api -> controlador: Actualizar setpoint
+controlador -> sensor: Aplicar nuevo valor
+backend -> dashboard: Respuesta JSON (éxito/error)
+dashboard -> usuario: Toast de confirmación
+
+note over backend
+  **Validaciones:**
+  - Sesión activa requerida
+  - Rol "Operario" para modificar
+  - Limpieza de formato (ej: "°C")
+  - Validación numérica
+end note
+
+note over db
+  **Actual:**
+  - Solo tabla Users
+  - Historial planificado
+end note
+
+@enduml
+
+

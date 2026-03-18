@@ -1,0 +1,167 @@
+@startuml Arquitectura del Sistema - Tres Capas
+
+!define RECTANGLE class
+skinparam backgroundColor #FAFAFA
+skinparam roundcorner 15
+skinparam shadowing true
+
+title Arquitectura del Sistema de Monitoreo IoT\nTres Capas - Almar SRL
+
+' ==========================================
+' CAPA 1: SENSADO Y CONTROL
+' ==========================================
+package "Capa 1: Sensado y Control" #E8F5E9 {
+  rectangle "Sensores de Temperatura" as sens_temp
+  rectangle "Sensores de Humedad" as sens_hum
+  rectangle "Sensores de CO₂ (NUONUO)" as sens_co2
+  rectangle "Sensores de Etileno (NUONUO)" as sens_etileno
+  rectangle "Controladores Sitrad" as controladores
+}
+
+' ==========================================
+' CAPA 2: BACKEND - Adquisición y Lógica
+' ==========================================
+package "Capa 2: Backend (ASP.NET Core MVC)" #E3F2FD {
+  
+  package "Controladores" {
+    rectangle "AccountController" as account_ctrl {
+      + Login()
+      + Register()
+      + Logout()
+    }
+    rectangle "SitradController" as sitrad_ctrl {
+      + Index()
+      + GetDashboardData()
+      + UpdateFunctionValue()
+    }
+  }
+  
+  package "Servicios" {
+    rectangle "AuthService" as auth_service {
+      + RegisterUser()
+      + Authenticate()
+      + ValidateInvitationCode()
+    }
+    rectangle "SitradApiClient" as sitrad_client {
+      + GetInstruments()
+      + GetValues()
+      + UpdateSetpoint()
+    }
+    rectangle "NuonuoApiClient" as nuonuo_client {
+      + GetSensorData()
+      + GetCO2()
+      + GetEtileno()
+    }
+  }
+  
+  package "Modelos" {
+    rectangle "User" as user_model {
+      + Id
+      + Username
+      + PasswordHash
+      + Role
+      + CreatedAt
+    }
+    rectangle "CameraViewModel" as camera_model {
+      + InstrumentId
+      + CameraName
+      + Temperature
+      + Humidity
+      + PulpTemp
+      + EvaporatorTemp
+      + Set1
+      + Set3
+      + co2
+      + etileno
+    }
+  }
+  
+  rectangle "AppDbContext\n(SQLite)" as db_context {
+    + Users
+  }
+}
+
+' ==========================================
+' CAPA 3: PRESENTACIÓN
+' ==========================================
+package "Capa 3: Presentación (Dashboard Web)" #FFF3E0 {
+  rectangle "Vistas Razor" as views {
+    Login.cshtml
+    Register.cshtml
+    Index.cshtml (Dashboard)
+  }
+  
+  rectangle "Frontend (jQuery + Tailwind)" as frontend {
+    + Actualización cada 5 segundos
+    + Semáforo temperatura pulpa
+    + Validación de permisos
+  }
+  
+  rectangle "Navegador Web\n(Desktop/Mobile)" as browser
+}
+
+' ==========================================
+' APIs EXTERNAS
+' ==========================================
+cloud "APIs Externas" #FFEBEE {
+  rectangle "Sitrad PRO API\nHTTP/JSON" as sitrad_api {
+    /instruments
+    /instruments/{id}/values
+    /instruments/{id}/functions
+  }
+  
+  rectangle "NUONUO Refrigeration API" as nuonuo_api {
+    /sensors
+    /readings
+  }
+}
+
+' ==========================================
+' RELACIONES
+' ==========================================
+
+' Capa 1 -> APIs
+sens_temp --> controladores
+sens_hum --> controladores
+controladores --> sitrad_api
+sens_co2 --> nuonuo_api
+sens_etileno --> nuonuo_api
+
+' APIs -> Backend
+sitrad_api --> sitrad_client
+nuonuo_api --> nuonuo_client
+
+' Backend interno
+account_ctrl --> auth_service
+sitrad_ctrl --> sitrad_client
+sitrad_ctrl --> nuonuo_client
+sitrad_ctrl --> camera_model
+account_ctrl --> user_model
+auth_service --> db_context
+db_context --> user_model
+
+' Backend -> Frontend
+sitrad_ctrl --> views
+account_ctrl --> views
+views --> frontend
+frontend --> browser
+
+' Notas
+note right of sitrad_client
+  Consulta periódica
+  de APIs externas
+end note
+
+note right of auth_service
+  Hash SHA256
+  Código de invitación
+end note
+
+note bottom of db_context
+  SQLite local
+  Creación automática
+end note
+
+@enduml
+
+
